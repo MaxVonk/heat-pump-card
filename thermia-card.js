@@ -1,8 +1,8 @@
 /**
  * Thermia Heat Pump Card for Home Assistant
  * Compatible with klejejs/ha-thermia-heat-pump-integration and ThermIQ
- * Author: Antigravity
- * Version: 1.0.0
+ * Author: Antigravity & MaxVonk
+ * Version: 1.1.0
  */
 
 class ThermiaCard extends HTMLElement {
@@ -12,54 +12,94 @@ class ThermiaCard extends HTMLElement {
     this._expanded = false;
     this._config = {};
     this._hass = null;
+    this._discoveredPrefix = null;
   }
 
   static getStubConfig() {
     return {
       type: "custom:thermia-card",
-      prefix: "thermia",
-      title: "Thermia"
+      title: "Thermia Heat Pump"
     };
   }
 
   setConfig(config) {
     this._config = {
-      prefix: "thermia",
       title: "Thermia",
       ...config,
       entities: {
         ...(config.entities || {})
       }
     };
+    this._discoveredPrefix = null;
     this._render();
   }
 
   set hass(hass) {
     const oldHass = this._hass;
     this._hass = hass;
+    if (!this._discoveredPrefix) {
+      this._discoveredPrefix = this._autoDiscoverPrefix();
+    }
     if (!oldHass || this._hasStateChanged(oldHass, hass)) {
       this._updateStates();
     }
   }
 
   getCardSize() {
-    return this._expanded ? 7 : 4;
+    return this._expanded ? 7 : 5;
+  }
+
+  _autoDiscoverPrefix() {
+    if (this._config.prefix && this._config.prefix !== 'thermia') {
+      return this._config.prefix;
+    }
+    if (!this._hass) return this._config.prefix || 'thermia';
+
+    // 1. Check if default 'thermia' exists
+    if (this._hass.states['sensor.thermia_supply_line_temperature']) {
+      return 'thermia';
+    }
+
+    // 2. Look for any sensor ending in _supply_line_temperature
+    const supplySensor = Object.keys(this._hass.states).find(k => 
+      k.startsWith('sensor.') && k.endsWith('_supply_line_temperature')
+    );
+    if (supplySensor) {
+      return supplySensor.replace('sensor.', '').replace('_supply_line_temperature', '');
+    }
+
+    // 3. Look for any water_heater.* entity
+    const wh = Object.keys(this._hass.states).find(k => k.startsWith('water_heater.'));
+    if (wh) {
+      return wh.replace('water_heater.', '');
+    }
+
+    return this._config.prefix || 'thermia';
   }
 
   _resolveEntity(key, fallbackSuffixes) {
     if (this._config.entities && this._config.entities[key]) {
       return this._config.entities[key];
     }
-    const prefix = this._config.prefix || 'thermia';
+    const prefix = this._discoveredPrefix || this._config.prefix || 'thermia';
     for (const suffix of fallbackSuffixes) {
       const candidate = `${suffix.domain}.${prefix}_${suffix.name}`;
       if (this._hass && this._hass.states[candidate]) {
         return candidate;
       }
     }
-    // Default to the first candidate even if not loaded yet
+    // Check if suffix matches exact entity name (e.g. water_heater.<prefix>)
+    for (const suffix of fallbackSuffixes) {
+      if (suffix.name === '') {
+        const candidate = `${suffix.domain}.${prefix}`;
+        if (this._hass && this._hass.states[candidate]) {
+          return candidate;
+        }
+      }
+    }
+    // Default fallback
     const def = fallbackSuffixes[0];
-    return `${def.domain}.${prefix}_${def.name}`;
+    return def.name === '' ? `${def.domain}.${prefix}` : `${def.domain}.${prefix}_${def.name}`;
   }
 
   _getEntityMap() {
@@ -127,7 +167,7 @@ class ThermiaCard extends HTMLElement {
         { domain: 'binary_sensor', name: 'supply_pump_on' }
       ]),
       water_heater: this._resolveEntity('water_heater', [
-        { domain: 'water_heater', name: (this._config.prefix || 'thermia') },
+        { domain: 'water_heater', name: '' },
         { domain: 'select', name: 'main_mode' }
       ]),
       hot_water_switch: this._resolveEntity('hot_water_switch', [
@@ -281,10 +321,6 @@ class ThermiaCard extends HTMLElement {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
         }
-        @keyframes spin-reverse {
-          from { transform: rotate(360deg); }
-          to { transform: rotate(0deg); }
-        }
         @keyframes pulse {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.5; }
@@ -323,62 +359,114 @@ class ThermiaCard extends HTMLElement {
           }
         }
 
-        /* Mode & Controls row */
-        .controls-row {
+        /* Controls Section */
+        .controls-section {
           margin-top: 14px;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .control-row {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 4px 8px;
+          padding: 8px 12px;
+          background: var(--secondary-background-color, rgba(125, 125, 125, 0.06));
+          border-radius: 10px;
+          transition: background 0.15s ease;
         }
-        .mode-container {
+        .control-row:hover {
+          background: var(--secondary-background-color, rgba(125, 125, 125, 0.1));
+        }
+
+        .control-left {
           display: flex;
           align-items: center;
           gap: 12px;
-          flex: 1;
         }
-        .mode-icon-circle {
-          width: 36px;
-          height: 36px;
+        .control-icon-circle {
+          width: 34px;
+          height: 34px;
           border-radius: 50%;
-          background: var(--secondary-background-color, rgba(125, 125, 125, 0.1));
+          background: var(--card-background-color, rgba(255, 255, 255, 0.8));
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
           display: flex;
           align-items: center;
           justify-content: center;
           color: var(--primary-color, #0284c7);
         }
-        .mode-details {
+        @media (prefers-color-scheme: dark) {
+          .control-icon-circle {
+            background: rgba(255, 255, 255, 0.1);
+          }
+        }
+
+        .control-meta {
           display: flex;
           flex-direction: column;
         }
-        .mode-label {
+        .control-title {
+          font-size: 0.85rem;
+          font-weight: 600;
+          color: var(--primary-text-color, #111827);
+          line-height: 1.2;
+        }
+        .control-subtitle {
           font-size: 0.72rem;
           color: var(--secondary-text-color, #6b7280);
-          text-transform: uppercase;
-          font-weight: 600;
-          letter-spacing: 0.05em;
+          margin-top: 2px;
         }
+
         .mode-select {
           background: transparent;
           border: none;
-          color: var(--primary-text-color, #111827);
-          font-size: 1.05rem;
-          font-weight: 500;
+          color: var(--primary-color, #0284c7);
+          font-size: 0.95rem;
+          font-weight: 600;
           font-family: inherit;
           cursor: pointer;
-          padding: 2px 0;
           outline: none;
-          border-bottom: 1px solid var(--divider-color, #d1d5db);
+          text-align: right;
         }
         .mode-select option {
           background: var(--ha-card-background, var(--card-background-color, #ffffff));
           color: var(--primary-text-color, #111827);
         }
 
+        /* Modern Toggle Switch */
+        .toggle-switch {
+          position: relative;
+          width: 44px;
+          height: 24px;
+          background: var(--divider-color, rgba(125, 125, 125, 0.25));
+          border-radius: 9999px;
+          cursor: pointer;
+          transition: background 0.25s ease;
+          user-select: none;
+        }
+        .toggle-switch.on {
+          background: var(--primary-color, #0284c7);
+        }
+        .toggle-switch-thumb {
+          position: absolute;
+          top: 2px;
+          left: 2px;
+          width: 20px;
+          height: 20px;
+          background: #ffffff;
+          border-radius: 50%;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+          transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .toggle-switch.on .toggle-switch-thumb {
+          transform: translateX(20px);
+        }
+
         .divider {
           height: 1px;
           background: var(--divider-color, rgba(0, 0, 0, 0.08));
-          margin: 10px 0 4px 0;
+          margin: 6px 0 2px 0;
         }
         @media (prefers-color-scheme: dark) {
           .divider {
@@ -416,10 +504,10 @@ class ThermiaCard extends HTMLElement {
         }
         .drawer.open {
           max-height: 500px;
-          margin-top: 12px;
+          margin-top: 10px;
         }
         .drawer-content {
-          padding-top: 8px;
+          padding-top: 4px;
           display: grid;
           grid-template-columns: repeat(2, 1fr);
           gap: 10px;
@@ -451,38 +539,6 @@ class ThermiaCard extends HTMLElement {
           font-size: 1.15rem;
           font-weight: 600;
           color: var(--primary-text-color, #111827);
-        }
-
-        .switch-row {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          background: var(--secondary-background-color, rgba(125, 125, 125, 0.06));
-          border-radius: 8px;
-          padding: 10px 12px;
-        }
-        .switch-label {
-          font-size: 0.85rem;
-          font-weight: 500;
-          color: var(--primary-text-color, #111827);
-        }
-        .toggle-btn {
-          padding: 5px 12px;
-          border-radius: 6px;
-          font-size: 0.8rem;
-          font-weight: 600;
-          border: none;
-          cursor: pointer;
-          transition: background 0.2s ease, color 0.2s ease;
-          outline: none;
-        }
-        .toggle-btn.active {
-          background: var(--primary-color, #0284c7);
-          color: #ffffff;
-        }
-        .toggle-btn.inactive {
-          background: var(--divider-color, rgba(125, 125, 125, 0.2));
-          color: var(--secondary-text-color, #6b7280);
         }
 
         .full-span {
@@ -521,7 +577,6 @@ class ThermiaCard extends HTMLElement {
         <div class="schematic-wrapper">
           <svg viewBox="0 0 380 340">
             <defs>
-              <!-- Cabinet Gradient -->
               <linearGradient id="cab-grad" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stop-color="#d1d5db" />
                 <stop offset="15%" stop-color="#f3f4f6" />
@@ -529,93 +584,69 @@ class ThermiaCard extends HTMLElement {
                 <stop offset="100%" stop-color="#9ca3af" />
               </linearGradient>
 
-              <!-- Brine Inflow Pipe Gradient (Cyan/Blue) -->
               <linearGradient id="brine-in-grad" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stop-color="#0284c7" />
                 <stop offset="100%" stop-color="#38bdf8" />
               </linearGradient>
 
-              <!-- Brine Outflow Pipe Gradient (Violet/Purple) -->
               <linearGradient id="brine-out-grad" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stop-color="#7c3aed" />
                 <stop offset="100%" stop-color="#8b5cf6" />
               </linearGradient>
 
-              <!-- Supply Flow Gradient (Warm Crimson/Red) -->
               <linearGradient id="supply-grad" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stop-color="#b91c1c" />
                 <stop offset="100%" stop-color="#ef4444" />
               </linearGradient>
 
-              <!-- Return Flow Gradient (Cooler Violet/Magenta) -->
               <linearGradient id="return-grad" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stop-color="#9333ea" />
                 <stop offset="100%" stop-color="#c026d3" />
               </linearGradient>
 
-              <!-- Shadow for badges -->
               <filter id="badge-shadow" x="-10%" y="-15%" width="120%" height="135%">
                 <feDropShadow dx="0" dy="1" stdDeviation="1" flood-opacity="0.15" />
               </filter>
             </defs>
 
-            <!-- ================= Heat Pump Unit Cabinet ================= -->
             <!-- Feet -->
             <rect x="156" y="286" width="16" height="5" rx="1.5" fill="#4b5563" />
             <rect x="208" y="286" width="16" height="5" rx="1.5" fill="#4b5563" />
 
             <!-- Main Cabinet Frame -->
             <rect x="145" y="16" width="90" height="270" rx="9" fill="url(#cab-grad)" stroke="#9ca3af" stroke-width="1.5" />
-            <!-- Top division line -->
             <line x1="146" y1="32" x2="234" y2="32" stroke="#d1d5db" stroke-width="1" />
             <!-- Display Panel Window -->
             <rect x="170" y="40" width="40" height="42" rx="3" fill="#374151" stroke="#1f2937" stroke-width="1" />
             <rect x="174" y="44" width="32" height="34" rx="2" fill="#1e293b" />
 
-            <!-- ================= PIPING SYSTEM ================= -->
-
-            <!-- 1. Brine Loop (Left side) -->
-            <!-- Brine In (Bottom left blue line into cabinet) -->
+            <!-- Brine Loop (Left) -->
             <path d="M 30 250 L 158 250 L 158 238" fill="none" stroke="url(#brine-in-grad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
-            <!-- Evaporator coil / heat exchange on left side of cabinet -->
             <rect x="153" y="145" width="10" height="92" rx="2" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.2" />
-            <!-- Brine Out (Exits top left) -->
             <path d="M 158 145 L 158 132 L 30 132" fill="none" stroke="url(#brine-out-grad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
 
-            <!-- 2. Refrigerant Circuit (Center) -->
-            <!-- Top condenser / compressor supply pipe loop -->
+            <!-- Refrigerant Circuit (Center) -->
             <path d="M 168 120 L 168 98 L 212 98 L 212 120" fill="none" stroke="url(#brine-out-grad)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
-            <!-- Compressor circle (top) -->
             <circle cx="190" cy="98" r="14" fill="#ffffff" stroke="#1f2937" stroke-width="2" />
             <path d="M 183 93 L 197 98 L 183 103 Z" fill="#1f2937" />
 
-            <!-- Vertical discharge / return refrigerant lines inside -->
             <line x1="168" y1="120" x2="168" y2="242" stroke="#3b82f6" stroke-width="7" stroke-linecap="round" />
             <line x1="212" y1="120" x2="212" y2="242" stroke="url(#return-grad)" stroke-width="7" stroke-linecap="round" />
 
-            <!-- Bottom expansion valve line -->
             <path d="M 168 242 L 168 266 L 212 266 L 212 242" fill="none" stroke="#3b82f6" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
-            <!-- Expansion Valve Symbol (Hourglass) -->
             <g transform="translate(190, 266)">
               <polygon points="-8,-6 8,6 8,-6 -8,6" fill="#ffffff" stroke="#1f2937" stroke-width="1.8" stroke-linejoin="round" />
             </g>
 
-            <!-- 3. Heating Circuit (Right side) -->
-            <!-- Supply top branch (to Hot Water & Radiators) -->
+            <!-- Heating Circuit (Right) -->
             <path d="M 216 112 L 340 112" fill="none" stroke="url(#supply-grad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
-            <!-- Radiator sub-branch -->
             <path d="M 235 112 L 235 152 L 340 152" fill="none" stroke="url(#supply-grad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
-            <!-- Return line from radiators -->
             <path d="M 340 250 L 222 250" fill="none" stroke="url(#return-grad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
-            <!-- Return connection up into condenser -->
             <path d="M 222 250 L 222 152" fill="none" stroke="url(#return-grad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
 
-            <!-- ================= ROTATING MECHANICS ================= -->
-
-            <!-- Central Gear / Compressor Running Icon -->
+            <!-- Rotating Central Compressor Gear -->
             <g id="compressor-gear" transform="translate(190, 185)">
               <g id="gear-spin-group" class="">
-                <!-- 8-tooth gear -->
                 <circle cx="0" cy="0" r="16" fill="#1f2937" />
                 <rect x="-3" y="-22" width="6" height="44" rx="2" fill="#1f2937" />
                 <rect x="-22" y="-3" width="44" height="6" rx="2" fill="#1f2937" />
@@ -629,7 +660,6 @@ class ThermiaCard extends HTMLElement {
             <g transform="translate(75, 132)">
               <circle cx="0" cy="0" r="17" fill="#ffffff" stroke="#6b7280" stroke-width="2.5" />
               <g id="brine-pump-spin-group" class="">
-                <!-- Pump rotating arrows -->
                 <path d="M -9 0 A 9 9 0 0 1 7 -5" fill="none" stroke="#1f2937" stroke-width="2" stroke-linecap="round" />
                 <polygon points="7,-9 11,-4 6,-2" fill="#1f2937" />
                 <path d="M 9 0 A 9 9 0 0 1 -7 5" fill="none" stroke="#1f2937" stroke-width="2" stroke-linecap="round" />
@@ -641,7 +671,6 @@ class ThermiaCard extends HTMLElement {
             <g transform="translate(295, 250)">
               <circle cx="0" cy="0" r="17" fill="#ffffff" stroke="#6b7280" stroke-width="2.5" />
               <g id="circ-pump-spin-group" class="">
-                <!-- Pump rotating arrows -->
                 <path d="M -9 0 A 9 9 0 0 1 7 -5" fill="none" stroke="#1f2937" stroke-width="2" stroke-linecap="round" />
                 <polygon points="7,-9 11,-4 6,-2" fill="#1f2937" />
                 <path d="M 9 0 A 9 9 0 0 1 -7 5" fill="none" stroke="#1f2937" stroke-width="2" stroke-linecap="round" />
@@ -649,63 +678,55 @@ class ThermiaCard extends HTMLElement {
               </g>
             </g>
 
-            <!-- Flow Arrows along pipes -->
-            <!-- Brine in arrow -->
+            <!-- Flow Arrows -->
             <polygon points="85,247 95,250 85,253" fill="#ffffff" opacity="0.9" />
-            <!-- Brine out arrow -->
             <polygon points="120,129 110,132 120,135" fill="#ffffff" opacity="0.9" />
-            <!-- Flow top right arrow -->
             <polygon points="265,109 275,112 265,115" fill="#ffffff" opacity="0.9" />
-            <!-- Radiator branch arrow -->
             <polygon points="265,149 275,152 265,155" fill="#ffffff" opacity="0.9" />
-            <!-- Return line arrow -->
             <polygon points="255,247 245,250 255,253" fill="#ffffff" opacity="0.9" />
 
-            <!-- ================= TEMPERATURE & STATUS BADGES ================= -->
-
-            <!-- 1. Brine In (3°c) -->
+            <!-- Badges -->
+            <!-- 1. Brine In -->
             <g class="badge-group" id="badge-brine-in" transform="translate(68, 238)">
               <rect class="badge-rect" x="-26" y="-10" width="52" height="20" filter="url(#badge-shadow)" />
               <text class="badge-text" id="val-brine-in">--°c</text>
             </g>
 
-            <!-- 2. Brine Pump Speed (100%) -->
+            <!-- 2. Brine Pump -->
             <g class="badge-group" id="badge-brine-pump" transform="translate(75, 158)">
               <rect class="badge-rect" x="-24" y="-9" width="48" height="18" filter="url(#badge-shadow)" />
               <text class="badge-text" id="val-brine-pump">ON</text>
             </g>
 
-            <!-- 3. Brine Out (0°c) -->
+            <!-- 3. Brine Out -->
             <g class="badge-group" id="badge-brine-out" transform="translate(68, 102)">
               <rect class="badge-rect" x="-26" y="-10" width="52" height="20" filter="url(#badge-shadow)" />
               <text class="badge-text" id="val-brine-out">--°c</text>
             </g>
 
-            <!-- 4. Hot Water / Boiler Temp (74°c at top center) -->
+            <!-- 4. Hot Water / Boiler Temp -->
             <g class="badge-group" id="badge-hot-water" transform="translate(190, 80)">
               <rect class="badge-rect" x="-25" y="-10" width="50" height="20" filter="url(#badge-shadow)" />
               <text class="badge-text" id="val-hot-water">--°c</text>
             </g>
 
-            <!-- 5. Discharge / Internal Temp (79°c) -->
+            <!-- 5. Discharge / Internal Temp -->
             <g class="badge-group" id="badge-internal" transform="translate(190, 138)">
               <rect class="badge-rect" x="-25" y="-10" width="50" height="20" filter="url(#badge-shadow)" />
               <text class="badge-text" id="val-internal">--°c</text>
             </g>
 
-            <!-- 6. Supply Line Temp (75°c + Flame icon) -->
+            <!-- 6. Supply Line Temp -->
             <g class="badge-group" id="badge-supply" transform="translate(295, 96)">
               <rect class="badge-rect" x="-25" y="-10" width="50" height="20" filter="url(#badge-shadow)" />
               <text class="badge-text" id="val-supply">--°c</text>
-              <!-- Flame icon -->
               <path d="M 28 3 C 27 -2 30 -7 33 -10 C 34 -8 34 -6 35 -4 C 37 -6 37 -9 37 -10 C 42 -5 44 2 40 7 C 38 9 34 10 32 10 C 29 10 27 7 28 3 Z" fill="#ef4444" />
             </g>
 
-            <!-- 7. Radiator Circuit / Target Supply Temp (45°c + Radiator icon) -->
+            <!-- 7. Radiator Circuit Temp -->
             <g class="badge-group" id="badge-desired-supply" transform="translate(295, 138)">
               <rect class="badge-rect" x="-25" y="-10" width="50" height="20" filter="url(#badge-shadow)" />
               <text class="badge-text" id="val-desired-supply">--°c</text>
-              <!-- Small Radiator Icon -->
               <g transform="translate(30, -8)">
                 <rect x="0" y="0" width="16" height="15" rx="1" fill="#e5e7eb" stroke="#6b7280" stroke-width="1" />
                 <line x1="4" y1="3" x2="4" y2="12" stroke="#6b7280" stroke-width="1.5" />
@@ -714,19 +735,19 @@ class ThermiaCard extends HTMLElement {
               </g>
             </g>
 
-            <!-- 8. Return Line Temp (36°c) -->
+            <!-- 8. Return Line Temp -->
             <g class="badge-group" id="badge-return" transform="translate(295, 218)">
               <rect class="badge-rect" x="-25" y="-10" width="50" height="20" filter="url(#badge-shadow)" />
               <text class="badge-text" id="val-return">--°c</text>
             </g>
 
-            <!-- 9. Heating Circulation Pump Speed (59%) -->
+            <!-- 9. Heating Circulation Pump Speed -->
             <g class="badge-group" id="badge-circ-pump" transform="translate(295, 276)">
               <rect class="badge-rect" x="-24" y="-9" width="48" height="18" filter="url(#badge-shadow)" />
               <text class="badge-text" id="val-circ-pump">ON</text>
             </g>
 
-            <!-- ================= Timestamp Status Bar ================= -->
+            <!-- Timestamp Status Bar -->
             <g transform="translate(190, 310)">
               <rect x="-85" y="-10" width="170" height="20" rx="5" fill="#9ca3af" opacity="0.9" />
               <text id="val-timestamp" x="0" y="1" font-family="inherit" font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle" dominant-baseline="central">--</text>
@@ -734,29 +755,71 @@ class ThermiaCard extends HTMLElement {
           </svg>
         </div>
 
-        <!-- Mode Selector Row -->
-        <div class="controls-row">
-          <div class="mode-container">
-            <div class="mode-icon-circle">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M16.56 5.44l-1.45 1.45A7 7 0 1 1 8.89 6.89L7.44 5.44A9 9 0 1 0 16.56 5.44zM13 2h-2v10h2V2z"/>
-              </svg>
+        <!-- Primary Controls Section -->
+        <div class="controls-section">
+          <!-- 1. Mode Control Row -->
+          <div class="control-row">
+            <div class="control-left">
+              <div class="control-icon-circle">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M16.56 5.44l-1.45 1.45A7 7 0 1 1 8.89 6.89L7.44 5.44A9 9 0 1 0 16.56 5.44zM13 2h-2v10h2V2z"/>
+                </svg>
+              </div>
+              <div class="control-meta">
+                <span class="control-title" id="mode-heat-pump-name">Thermia Mode</span>
+                <span class="control-subtitle" id="mode-subtitle">Current: Auto</span>
+              </div>
             </div>
-            <div class="mode-details">
-              <span class="mode-label">Thermia Mode</span>
-              <select class="mode-select" id="mode-select">
-                <option value="Auto">Auto</option>
-                <option value="Manual">Manual</option>
-                <option value="Off">Off</option>
-              </select>
+            <select class="mode-select" id="mode-select">
+              <option value="Auto">Auto</option>
+              <option value="Manual">Manual</option>
+              <option value="Off">Off</option>
+            </select>
+          </div>
+
+          <!-- 2. Hot Water Toggle Row -->
+          <div class="control-row">
+            <div class="control-left">
+              <div class="control-icon-circle">
+                <!-- Water heater icon -->
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2a6 6 0 0 0-6 6v10a4 4 0 0 0 4 4h4a4 4 0 0 0 4-4V8a6 6 0 0 0-6-6zm0 2a4 4 0 0 1 4 4v2H8V8a4 4 0 0 1 4-4zm-2 10a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"/>
+                </svg>
+              </div>
+              <div class="control-meta">
+                <span class="control-title">Hot Water</span>
+                <span class="control-subtitle" id="status-hw">Active</span>
+              </div>
+            </div>
+            <div class="toggle-switch on" id="switch-hw" title="Toggle Hot Water">
+              <div class="toggle-switch-thumb"></div>
+            </div>
+          </div>
+
+          <!-- 3. Hot Water Boost Toggle Row -->
+          <div class="control-row">
+            <div class="control-left">
+              <div class="control-icon-circle">
+                <!-- Boost double arrow / wave icon -->
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M4 14h4v7a1 1 0 0 0 1.7.7l11-13A1 1 0 0 0 20 7h-4V1a1 1 0 0 0-1.7-.7l-11 13A1 1 0 0 0 4 14z"/>
+                </svg>
+              </div>
+              <div class="control-meta">
+                <span class="control-title">Hot Water Boost</span>
+                <span class="control-subtitle" id="status-boost">Extra hot water on demand</span>
+              </div>
+            </div>
+            <div class="toggle-switch" id="switch-boost" title="Toggle Hot Water Boost">
+              <div class="toggle-switch-thumb"></div>
             </div>
           </div>
         </div>
 
         <div class="divider"></div>
 
-        <!-- Chevron Expand Button -->
-        <div class="chevron-btn" id="chevron-btn" title="Toggle detailed controls">
+        <!-- Chevron Expand Button for Secondary Metrics -->
+        <div class="chevron-btn" id="chevron-btn" title="Toggle detailed statistics">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
             <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
           </svg>
@@ -789,18 +852,6 @@ class ThermiaCard extends HTMLElement {
               <span class="stat-value" id="val-integral">--</span>
             </div>
 
-            <!-- Hot Water Switch -->
-            <div class="switch-row" id="row-hot-water-switch">
-              <span class="switch-label">Hot Water</span>
-              <button class="toggle-btn inactive" id="btn-hot-water">OFF</button>
-            </div>
-
-            <!-- Hot Water Boost Switch -->
-            <div class="switch-row" id="row-hot-water-boost">
-              <span class="switch-label">Hot Water Boost</span>
-              <button class="toggle-btn inactive" id="btn-hot-water-boost">OFF</button>
-            </div>
-
             <!-- Operational Hours -->
             <div class="stat-card full-span">
               <span class="stat-title" style="margin-bottom: 6px;">Operational Statistics</span>
@@ -830,13 +881,13 @@ class ThermiaCard extends HTMLElement {
       this._handleModeChange(e.target.value);
     });
 
-    const btnHw = this.shadowRoot.getElementById('btn-hot-water');
-    btnHw.addEventListener('click', () => {
+    const switchHw = this.shadowRoot.getElementById('switch-hw');
+    switchHw.addEventListener('click', () => {
       this._toggleSwitch(this._getEntityMap().hot_water_switch);
     });
 
-    const btnBoost = this.shadowRoot.getElementById('btn-hot-water-boost');
-    btnBoost.addEventListener('click', () => {
+    const switchBoost = this.shadowRoot.getElementById('switch-boost');
+    switchBoost.addEventListener('click', () => {
       this._toggleSwitch(this._getEntityMap().hot_water_boost_switch);
     });
 
@@ -950,14 +1001,13 @@ class ThermiaCard extends HTMLElement {
     const timestampStr = `${dateObj.getFullYear()}-${pad(dateObj.getMonth() + 1)}-${pad(dateObj.getDate())} ${pad(dateObj.getHours())}:${pad(dateObj.getMinutes())}:${pad(dateObj.getSeconds())}`;
     setText('val-timestamp', timestampStr);
 
-    // 4. Mode selector
+    // 4. Water Heater / Mode selector
     const waterHeaterState = this._hass.states[map.water_heater];
     const modeSelect = this.shadowRoot.getElementById('mode-select');
     if (waterHeaterState && modeSelect) {
       const currentOp = waterHeaterState.state;
       const opList = waterHeaterState.attributes.operation_list || ['Auto', 'Manual', 'Off'];
       
-      // Update options if not already matching
       if (modeSelect.options.length !== opList.length) {
         modeSelect.innerHTML = '';
         opList.forEach(op => {
@@ -968,9 +1018,34 @@ class ThermiaCard extends HTMLElement {
         });
       }
       modeSelect.value = currentOp;
+      
+      const friendlyName = waterHeaterState.attributes.friendly_name || 'Thermia';
+      setText('mode-heat-pump-name', `${friendlyName} Mode`);
+      const targetT = waterHeaterState.attributes.temperature;
+      const curT = waterHeaterState.attributes.current_temperature;
+      if (targetT !== undefined) {
+        setText('mode-subtitle', `${currentOp.toUpperCase()} ${targetT} °C${curT !== undefined ? ` • Current: ${curT} °C` : ''}`);
+      } else {
+        setText('mode-subtitle', `Current: ${currentOp}`);
+      }
     }
 
-    // 5. Drawer Secondary Stats
+    // 5. Switches on Main Card
+    const hwSwitchOn = this._isEntityOn(map.hot_water_switch);
+    const switchHw = this.shadowRoot.getElementById('switch-hw');
+    if (switchHw) {
+      switchHw.classList.toggle('on', hwSwitchOn);
+      setText('status-hw', hwSwitchOn ? 'On' : 'Off');
+    }
+
+    const boostOn = this._isEntityOn(map.hot_water_boost_switch);
+    const switchBoost = this.shadowRoot.getElementById('switch-boost');
+    if (switchBoost) {
+      switchBoost.classList.toggle('on', boostOn);
+      setText('status-boost', boostOn ? 'Boost Active' : 'Off');
+    }
+
+    // 6. Drawer Secondary Stats
     const indoor = this._getState(map.indoor_temp);
     const outdoor = this._getState(map.outdoor_temp);
     const target = this._getState(map.heat_target_temp);
@@ -980,21 +1055,6 @@ class ThermiaCard extends HTMLElement {
     setText('val-outdoor', this._formatTemp(outdoor));
     setText('val-target', this._formatTemp(target));
     setText('val-integral', integral !== '--' ? `${integral} °min` : '--');
-
-    // Switches
-    const hwSwitchOn = this._isEntityOn(map.hot_water_switch);
-    const btnHw = this.shadowRoot.getElementById('btn-hot-water');
-    if (btnHw) {
-      btnHw.textContent = hwSwitchOn ? 'ON' : 'OFF';
-      btnHw.className = `toggle-btn ${hwSwitchOn ? 'active' : 'inactive'}`;
-    }
-
-    const boostOn = this._isEntityOn(map.hot_water_boost_switch);
-    const btnBoost = this.shadowRoot.getElementById('btn-hot-water-boost');
-    if (btnBoost) {
-      btnBoost.textContent = boostOn ? 'ON' : 'OFF';
-      btnBoost.className = `toggle-btn ${boostOn ? 'active' : 'inactive'}`;
-    }
 
     // Operational statistics
     setText('hours-compressor', `${this._getState(map.compressor_time, '0')} h`);
@@ -1013,7 +1073,7 @@ class ThermiaCard extends HTMLElement {
   }
 }
 
-// Register the custom element
+// Register custom element
 if (!customElements.get('thermia-card')) {
   customElements.define('thermia-card', ThermiaCard);
 }
@@ -1025,6 +1085,5 @@ window.customCards.push({
   name: "Thermia Heat Pump Card",
   description: "A graphical schematic card for Thermia heat pumps with live animated flows and controls.",
   preview: true,
-  documentationURL: "https://github.com/klejejs/ha-thermia-heat-pump-integration"
+  documentationURL: "https://github.com/MaxVonk/thermia-card"
 });
-
