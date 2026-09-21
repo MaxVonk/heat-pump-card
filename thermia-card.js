@@ -2,7 +2,7 @@
  * Thermia & Multi-Brand Heat Pump Card for Home Assistant
  * Compatible with Ground-Source (Geothermal/Brine) & Air-to-Water heat pumps
  * Author: Antigravity & MaxVonk
- * Version: 1.2.0
+ * Version: 1.3.0
  */
 
 class ThermiaCard extends HTMLElement {
@@ -398,7 +398,7 @@ class ThermiaCard extends HTMLElement {
           }
         }
 
-        /* Controls Section */
+        /* Native Home Assistant Controls & Tile Styling */
         .controls-section {
           margin-top: 14px;
           display: flex;
@@ -406,136 +406,208 @@ class ThermiaCard extends HTMLElement {
           gap: 10px;
         }
 
-        .control-row {
+        /* 1. Mode Tile */
+        .ha-mode-tile {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 8px 12px;
-          background: var(--secondary-background-color, rgba(125, 125, 125, 0.06));
-          border-radius: 10px;
-          transition: background 0.15s ease;
-        }
-        .control-row:hover {
-          background: var(--secondary-background-color, rgba(125, 125, 125, 0.1));
+          padding: 10px 14px;
+          background: var(--ha-card-background, var(--card-background-color, #ffffff));
+          border: 1px solid var(--ha-card-border-color, var(--divider-color, rgba(0, 0, 0, 0.08)));
+          border-radius: var(--ha-card-border-radius, 12px);
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+          gap: 12px;
         }
 
-        .control-left {
+        .ha-mode-left {
           display: flex;
           align-items: center;
           gap: 12px;
+          min-width: 0;
         }
-        .control-icon-circle {
-          width: 34px;
-          height: 34px;
-          border-radius: 50%;
-          background: var(--card-background-color, rgba(255, 255, 255, 0.8));
-          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+
+        .ha-icon-box {
+          width: 38px;
+          height: 38px;
+          border-radius: 10px;
           display: flex;
           align-items: center;
           justify-content: center;
+          flex-shrink: 0;
+          transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .ha-icon-box.primary {
+          background: rgba(var(--rgb-primary-color, 3, 169, 244), 0.12);
           color: var(--primary-color, #0284c7);
         }
-        @media (prefers-color-scheme: dark) {
-          .control-icon-circle {
-            background: rgba(255, 255, 255, 0.1);
-          }
+        .ha-icon-box.hw-active {
+          background: rgba(6, 182, 212, 0.15);
+          color: #0891b2;
+        }
+        .ha-icon-box.boost-active {
+          background: rgba(245, 158, 11, 0.15);
+          color: #d97706;
+        }
+        .ha-icon-box.inactive {
+          background: var(--secondary-background-color, rgba(125, 125, 125, 0.1));
+          color: var(--secondary-text-color, #6b7280);
         }
 
-        .control-meta {
+        .ha-tile-meta {
           display: flex;
           flex-direction: column;
+          min-width: 0;
         }
-        .control-title {
-          font-size: 0.85rem;
-          font-weight: 600;
+        .ha-tile-title {
+          font-size: 0.88rem;
+          font-weight: 500;
           color: var(--primary-text-color, #111827);
           line-height: 1.2;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
-        .control-subtitle {
+        .ha-tile-subtitle {
           font-size: 0.72rem;
           color: var(--secondary-text-color, #6b7280);
           margin-top: 2px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
-        .mode-select {
-          background: transparent;
+        /* Segmented Mode Selector */
+        .ha-segmented-control {
+          display: flex;
+          align-items: center;
+          background: var(--secondary-background-color, rgba(125, 125, 125, 0.08));
+          border-radius: 8px;
+          padding: 2px;
+          border: 1px solid var(--divider-color, rgba(0, 0, 0, 0.06));
+          flex-shrink: 0;
+        }
+        .ha-seg-btn {
           border: none;
-          color: var(--primary-color, #0284c7);
-          font-size: 0.95rem;
-          font-weight: 600;
+          background: transparent;
           font-family: inherit;
+          font-size: 0.75rem;
+          font-weight: 500;
+          color: var(--secondary-text-color, #6b7280);
+          padding: 4px 10px;
+          border-radius: 6px;
           cursor: pointer;
-          outline: none;
-          text-align: right;
-        }
-        .mode-select option {
-          background: var(--ha-card-background, var(--card-background-color, #ffffff));
-          color: var(--primary-text-color, #111827);
-        }
-
-        /* Modern Toggle Switch */
-        .toggle-switch {
-          position: relative;
-          width: 44px;
-          height: 24px;
-          background: var(--divider-color, rgba(125, 125, 125, 0.25));
-          border-radius: 9999px;
-          cursor: pointer;
-          transition: background 0.25s ease;
+          transition: all 0.15s ease;
           user-select: none;
         }
-        .toggle-switch.on {
-          background: var(--primary-color, #0284c7);
+        .ha-seg-btn:hover {
+          color: var(--primary-text-color, #111827);
         }
-        .toggle-switch-thumb {
-          position: absolute;
-          top: 2px;
-          left: 2px;
-          width: 20px;
-          height: 20px;
-          background: #ffffff;
-          border-radius: 50%;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
-          transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .toggle-switch.on .toggle-switch-thumb {
-          transform: translateX(20px);
-        }
-
-        .divider {
-          height: 1px;
-          background: var(--divider-color, rgba(0, 0, 0, 0.08));
-          margin: 6px 0 2px 0;
+        .ha-seg-btn.active {
+          background: var(--ha-card-background, var(--card-background-color, #ffffff));
+          color: var(--primary-color, #0284c7);
+          font-weight: 600;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
         @media (prefers-color-scheme: dark) {
-          .divider {
-            background: rgba(255, 255, 255, 0.08);
+          .ha-seg-btn.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: #38bdf8;
           }
         }
 
-        .chevron-btn {
+        /* 2-Column Grid of Switches */
+        .ha-tiles-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 10px;
+        }
+        @media (max-width: 360px) {
+          .ha-tiles-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        .ha-switch-tile {
           display: flex;
           align-items: center;
-          justify-content: center;
-          width: 32px;
-          height: 32px;
-          border-radius: 50%;
-          margin: 0 auto;
+          justify-content: space-between;
+          padding: 10px 12px;
+          background: var(--ha-card-background, var(--card-background-color, #ffffff));
+          border: 1px solid var(--ha-card-border-color, var(--divider-color, rgba(0, 0, 0, 0.08)));
+          border-radius: var(--ha-card-border-radius, 12px);
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
           cursor: pointer;
-          background: var(--secondary-background-color, rgba(125, 125, 125, 0.08));
-          color: var(--secondary-text-color, #6b7280);
-          transition: transform 0.25s ease, background 0.2s ease;
+          transition: border-color 0.15s ease, background 0.15s ease;
           user-select: none;
+          gap: 8px;
         }
-        .chevron-btn:hover {
-          background: var(--secondary-background-color, rgba(125, 125, 125, 0.16));
+        .ha-switch-tile:hover {
+          border-color: var(--primary-color, #0284c7);
+        }
+
+        /* Home Assistant Switch Component */
+        .ha-switch {
+          position: relative;
+          width: 36px;
+          height: 16px;
+          background: var(--divider-color, rgba(125, 125, 125, 0.35));
+          border-radius: 9999px;
+          cursor: pointer;
+          transition: background 0.25s ease;
+          flex-shrink: 0;
+          display: flex;
+          align-items: center;
+        }
+        .ha-switch.on {
+          background: rgba(var(--rgb-primary-color, 3, 169, 244), 0.5);
+        }
+        .ha-switch-thumb {
+          position: absolute;
+          left: 0;
+          width: 18px;
+          height: 18px;
+          background: #ffffff;
+          border-radius: 50%;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+          transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.22s ease;
+        }
+        .ha-switch.on .ha-switch-thumb {
+          transform: translateX(18px);
+          background: var(--primary-color, #0284c7);
+        }
+
+        /* Expander Bar */
+        .ha-expander {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 8px 10px;
+          margin-top: 4px;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: background 0.15s ease, color 0.15s ease;
+          user-select: none;
+          color: var(--secondary-text-color, #6b7280);
+          font-size: 0.78rem;
+          font-weight: 500;
+        }
+        .ha-expander:hover {
+          background: var(--secondary-background-color, rgba(125, 125, 125, 0.08));
           color: var(--primary-text-color, #111827);
         }
-        .chevron-btn.open {
+        .ha-expander-label {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+        .ha-expander-chevron {
+          transition: transform 0.25s ease;
+        }
+        .ha-expander.open .ha-expander-chevron {
           transform: rotate(180deg);
         }
 
-        /* Collapsible Drawer */
+        /* Expandable Drawer in pure HA style */
         .drawer {
           max-height: 0;
           overflow: hidden;
@@ -543,62 +615,127 @@ class ThermiaCard extends HTMLElement {
         }
         .drawer.open {
           max-height: 500px;
-          margin-top: 10px;
+          margin-top: 8px;
         }
-        .drawer-content {
-          padding-top: 4px;
+        .ha-sensor-grid {
           display: grid;
           grid-template-columns: repeat(2, 1fr);
-          gap: 10px;
+          gap: 8px;
+          margin-bottom: 10px;
         }
-        @media (max-width: 380px) {
-          .drawer-content {
+        @media (max-width: 360px) {
+          .ha-sensor-grid {
             grid-template-columns: 1fr;
           }
         }
 
-        .stat-card {
-          background: var(--secondary-background-color, rgba(125, 125, 125, 0.06));
-          border-radius: 8px;
-          padding: 10px 12px;
+        .ha-sensor-tile {
           display: flex;
-          flex-direction: column;
-          gap: 4px;
+          align-items: center;
+          gap: 10px;
+          padding: 8px 12px;
+          background: var(--ha-card-background, var(--card-background-color, #ffffff));
+          border: 1px solid var(--ha-card-border-color, var(--divider-color, rgba(0, 0, 0, 0.08)));
+          border-radius: var(--ha-card-border-radius, 12px);
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
           cursor: pointer;
+          transition: border-color 0.15s ease, transform 0.15s ease;
         }
-        .stat-card:hover {
-          background: var(--secondary-background-color, rgba(125, 125, 125, 0.12));
+        .ha-sensor-tile:hover {
+          border-color: var(--primary-color, #0284c7);
         }
-        .stat-title {
-          font-size: 0.75rem;
+
+        .ha-sensor-icon {
+          width: 32px;
+          height: 32px;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+        .ha-sensor-icon svg {
+          width: 18px;
+          height: 18px;
+        }
+        .ha-sensor-icon.green {
+          background: rgba(16, 185, 129, 0.12);
+          color: #10b981;
+        }
+        .ha-sensor-icon.blue {
+          background: rgba(59, 130, 246, 0.12);
+          color: #3b82f6;
+        }
+        .ha-sensor-icon.orange {
+          background: rgba(249, 115, 22, 0.12);
+          color: #f97316;
+        }
+        .ha-sensor-icon.purple {
+          background: rgba(168, 85, 247, 0.12);
+          color: #a855f7;
+        }
+
+        .ha-sensor-info {
+          min-width: 0;
+        }
+        .ha-sensor-label {
+          font-size: 0.7rem;
+          font-weight: 500;
+          color: var(--secondary-text-color, #6b7280);
+          line-height: 1.1;
+        }
+        .ha-sensor-value {
+          font-size: 0.95rem;
+          font-weight: 600;
+          color: var(--primary-text-color, #111827);
+          margin-top: 2px;
+        }
+
+        /* Modern HA Statistics Panel */
+        .ha-stats-panel {
+          padding: 10px 12px;
+          background: var(--ha-card-background, var(--card-background-color, #ffffff));
+          border: 1px solid var(--ha-card-border-color, var(--divider-color, rgba(0, 0, 0, 0.08)));
+          border-radius: var(--ha-card-border-radius, 12px);
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+        }
+        .ha-stats-header {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 0.72rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+          color: var(--secondary-text-color, #6b7280);
+          margin-bottom: 8px;
+        }
+        .ha-stats-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 6px;
+        }
+        @media (max-width: 400px) {
+          .ha-stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+        .ha-stat-box {
+          background: var(--secondary-background-color, rgba(125, 125, 125, 0.05));
+          padding: 6px 8px;
+          border-radius: 8px;
+          text-align: center;
+        }
+        .ha-stat-name {
+          font-size: 0.68rem;
           color: var(--secondary-text-color, #6b7280);
           font-weight: 500;
         }
-        .stat-value {
-          font-size: 1.15rem;
-          font-weight: 600;
+        .ha-stat-val {
+          font-size: 0.82rem;
+          font-weight: 700;
           color: var(--primary-text-color, #111827);
-        }
-
-        .full-span {
-          grid-column: 1 / -1;
-        }
-
-        .hours-grid {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 6px;
-          font-size: 0.8rem;
-          color: var(--secondary-text-color, #6b7280);
-        }
-        .hours-item {
-          display: flex;
-          justify-content: space-between;
-          padding: 3px 0;
-          border-bottom: 1px dashed var(--divider-color, rgba(125, 125, 125, 0.2));
-        }
-        .hours-item strong {
-          color: var(--primary-text-color, #111827);
+          margin-top: 2px;
         }
       </style>
 
@@ -856,109 +993,155 @@ class ThermiaCard extends HTMLElement {
           </svg>
         </div>
 
-        <!-- Primary Controls Section -->
+        <!-- Primary Controls Section (Pure Home Assistant Style) -->
         <div class="controls-section">
-          <!-- 1. Mode Control Row -->
-          <div class="control-row">
-            <div class="control-left">
-              <div class="control-icon-circle">
+          <!-- 1. Mode Tile -->
+          <div class="ha-mode-tile">
+            <div class="ha-mode-left">
+              <div class="ha-icon-box primary">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M16.56 5.44l-1.45 1.45A7 7 0 1 1 8.89 6.89L7.44 5.44A9 9 0 1 0 16.56 5.44zM13 2h-2v10h2V2z"/>
                 </svg>
               </div>
-              <div class="control-meta">
-                <span class="control-title" id="mode-heat-pump-name">Heat Pump Mode</span>
-                <span class="control-subtitle" id="mode-subtitle">Current: Auto</span>
+              <div class="ha-tile-meta">
+                <span class="ha-tile-title" id="mode-heat-pump-name">Heat Pump Mode</span>
+                <span class="ha-tile-subtitle" id="mode-subtitle">Auto • 20 °C</span>
               </div>
             </div>
-            <select class="mode-select" id="mode-select">
-              <option value="Auto">Auto</option>
-              <option value="Manual">Manual</option>
-              <option value="Off">Off</option>
-            </select>
-          </div>
-
-          <!-- 2. Hot Water Toggle Row -->
-          <div class="control-row">
-            <div class="control-left">
-              <div class="control-icon-circle">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2a6 6 0 0 0-6 6v10a4 4 0 0 0 4 4h4a4 4 0 0 0 4-4V8a6 6 0 0 0-6-6zm0 2a4 4 0 0 1 4 4v2H8V8a4 4 0 0 1 4-4zm-2 10a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"/>
-                </svg>
-              </div>
-              <div class="control-meta">
-                <span class="control-title">Hot Water</span>
-                <span class="control-subtitle" id="status-hw">Active</span>
-              </div>
-            </div>
-            <div class="toggle-switch on" id="switch-hw" title="Toggle Hot Water">
-              <div class="toggle-switch-thumb"></div>
+            <!-- Segmented Control Buttons -->
+            <div class="ha-segmented-control" id="mode-segmented">
+              <button type="button" class="ha-seg-btn active" data-mode="Auto" id="btn-mode-auto">Auto</button>
+              <button type="button" class="ha-seg-btn" data-mode="Manual" id="btn-mode-manual">Manual</button>
+              <button type="button" class="ha-seg-btn" data-mode="Off" id="btn-mode-off">Off</button>
             </div>
           </div>
 
-          <!-- 3. Hot Water Boost Toggle Row -->
-          <div class="control-row">
-            <div class="control-left">
-              <div class="control-icon-circle">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M4 14h4v7a1 1 0 0 0 1.7.7l11-13A1 1 0 0 0 20 7h-4V1a1 1 0 0 0-1.7-.7l-11 13A1 1 0 0 0 4 14z"/>
-                </svg>
+          <!-- 2-Column Grid of Switches (Hot Water & Boost) -->
+          <div class="ha-tiles-grid">
+            
+            <!-- Hot Water Tile -->
+            <div class="ha-switch-tile" id="tile-hw">
+              <div class="ha-mode-left">
+                <div class="ha-icon-box hw-active" id="hw-icon-box">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2a6 6 0 0 0-6 6v10a4 4 0 0 0 4 4h4a4 4 0 0 0 4-4V8a6 6 0 0 0-6-6zm0 2a4 4 0 0 1 4 4v2H8V8a4 4 0 0 1 4-4zm-2 10a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"/>
+                  </svg>
+                </div>
+                <div class="ha-tile-meta">
+                  <span class="ha-tile-title">Hot Water</span>
+                  <span class="ha-tile-subtitle" id="status-hw">On</span>
+                </div>
               </div>
-              <div class="control-meta">
-                <span class="control-title">Hot Water Boost</span>
-                <span class="control-subtitle" id="status-boost">Extra hot water on demand</span>
+              <div class="ha-switch on" id="switch-hw" title="Toggle Hot Water">
+                <div class="ha-switch-thumb"></div>
               </div>
             </div>
-            <div class="toggle-switch" id="switch-boost" title="Toggle Hot Water Boost">
-              <div class="toggle-switch-thumb"></div>
+
+            <!-- Hot Water Boost Tile -->
+            <div class="ha-switch-tile" id="tile-boost">
+              <div class="ha-mode-left">
+                <div class="ha-icon-box inactive" id="boost-icon-box">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M4 14h4v7a1 1 0 0 0 1.7.7l11-13A1 1 0 0 0 20 7h-4V1a1 1 0 0 0-1.7-.7l-11 13A1 1 0 0 0 4 14z"/>
+                  </svg>
+                </div>
+                <div class="ha-tile-meta">
+                  <span class="ha-tile-title">Boost</span>
+                  <span class="ha-tile-subtitle" id="status-boost">Off</span>
+                </div>
+              </div>
+              <div class="ha-switch" id="switch-boost" title="Toggle Hot Water Boost">
+                <div class="ha-switch-thumb"></div>
+              </div>
             </div>
+
           </div>
         </div>
 
-        <div class="divider"></div>
-
-        <!-- Chevron Expand Button for Secondary Metrics -->
-        <div class="chevron-btn" id="chevron-btn" title="Toggle detailed statistics">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <!-- Expander Button Bar -->
+        <div class="ha-expander" id="chevron-btn" title="Toggle detailed metrics">
+          <span class="ha-expander-label">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+            </svg>
+            Detailed Metrics & Runtime
+          </span>
+          <svg class="ha-expander-chevron" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
             <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
           </svg>
         </div>
 
-        <!-- Expandable Drawer -->
+        <!-- Expandable Drawer in Pure HA Style -->
         <div class="drawer" id="drawer">
-          <div class="drawer-content">
+          <!-- 2x2 Metric Tiles -->
+          <div class="ha-sensor-grid">
             <!-- Indoor Temp -->
-            <div class="stat-card" id="card-indoor">
-              <span class="stat-title">Indoor Temperature</span>
-              <span class="stat-value" id="val-indoor">--</span>
+            <div class="ha-sensor-tile" id="card-indoor">
+              <div class="ha-sensor-icon green">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3zm0 10.5a1.5 1.5 0 0 1-1.5-1.5c0-.5.2-.9.6-1.2V8a.9.9 0 0 1 1.8 0v2.8c.4.3.6.7.6 1.2 0 .8-.7 1.5-1.5 1.5z"/></svg>
+              </div>
+              <div class="ha-sensor-info">
+                <div class="ha-sensor-label">Indoor</div>
+                <div class="ha-sensor-value" id="val-indoor">--</div>
+              </div>
             </div>
 
             <!-- Outdoor Temp -->
-            <div class="stat-card" id="card-outdoor">
-              <span class="stat-title">Outdoor Temperature</span>
-              <span class="stat-value" id="val-outdoor">--</span>
+            <div class="ha-sensor-tile" id="card-outdoor">
+              <div class="ha-sensor-icon blue">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.5 20q-2.275 0-3.887-1.575Q1 16.85 1 14.575q0-1.95 1.175-3.475Q3.35 9.575 5.25 9.15q.625-2.3 2.5-3.725Q9.625 4 12 4q2.925 0 4.962 2.038Q19 8.075 19 11q1.725.2 2.862 1.488Q23 13.775 23 15.5q0 1.875-1.312 3.188Q20.375 20 18.5 20Z"/></svg>
+              </div>
+              <div class="ha-sensor-info">
+                <div class="ha-sensor-label">Outdoor</div>
+                <div class="ha-sensor-value" id="val-outdoor">--</div>
+              </div>
             </div>
 
             <!-- Target Temp -->
-            <div class="stat-card" id="card-target">
-              <span class="stat-title">Heat Target Temp</span>
-              <span class="stat-value" id="val-target">--</span>
+            <div class="ha-sensor-tile" id="card-target">
+              <div class="ha-sensor-icon orange">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm0-14a6 6 0 1 0 6 6 6 6 0 0 0-6-6zm0 10a4 4 0 1 1 4-4 4 4 0 0 1-4 4zm0-6a2 2 0 1 0 2 2 2 2 0 0 0-2-2z"/></svg>
+              </div>
+              <div class="ha-sensor-info">
+                <div class="ha-sensor-label">Heat Target</div>
+                <div class="ha-sensor-value" id="val-target">--</div>
+              </div>
             </div>
 
             <!-- Integral -->
-            <div class="stat-card" id="card-integral">
-              <span class="stat-title">System Integral</span>
-              <span class="stat-value" id="val-integral">--</span>
+            <div class="ha-sensor-tile" id="card-integral">
+              <div class="ha-sensor-icon purple">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14h-2V7h2v10zm-4 0H6v-6h2v6zm8 0h-2v-4h2v4z"/></svg>
+              </div>
+              <div class="ha-sensor-info">
+                <div class="ha-sensor-label">System Integral</div>
+                <div class="ha-sensor-value" id="val-integral">--</div>
+              </div>
             </div>
+          </div>
 
-            <!-- Operational Hours -->
-            <div class="stat-card full-span">
-              <span class="stat-title" style="margin-bottom: 6px;">Operational Statistics</span>
-              <div class="hours-grid">
-                <div class="hours-item"><span>Compressor:</span> <strong id="hours-compressor">-- h</strong></div>
-                <div class="hours-item"><span>Heating:</span> <strong id="hours-heating">-- h</strong></div>
-                <div class="hours-item"><span>Hot Water:</span> <strong id="hours-hot-water">-- h</strong></div>
-                <div class="hours-item"><span>Aux Heater:</span> <strong id="hours-aux">-- h</strong></div>
+          <!-- Operational Runtime Stats Panel -->
+          <div class="ha-stats-panel">
+            <div class="ha-stats-header">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 14.5h-2V13h2v3.5zm0-5.5h-2V7h2v4z"/></svg>
+              <span>Operational Runtime</span>
+            </div>
+            <div class="ha-stats-grid">
+              <div class="ha-stat-box">
+                <div class="ha-stat-name">Compressor</div>
+                <div class="ha-stat-val" id="hours-compressor">-- h</div>
+              </div>
+              <div class="ha-stat-box">
+                <div class="ha-stat-name">Heating</div>
+                <div class="ha-stat-val" id="hours-heating">-- h</div>
+              </div>
+              <div class="ha-stat-box">
+                <div class="ha-stat-name">Hot Water</div>
+                <div class="ha-stat-val" id="hours-hot-water">-- h</div>
+              </div>
+              <div class="ha-stat-box">
+                <div class="ha-stat-name">Aux Heater</div>
+                <div class="ha-stat-val" id="hours-aux">-- h</div>
               </div>
             </div>
           </div>
@@ -969,26 +1152,36 @@ class ThermiaCard extends HTMLElement {
     // Attach DOM Event Listeners
     const chevron = this.shadowRoot.getElementById('chevron-btn');
     const drawer = this.shadowRoot.getElementById('drawer');
-    chevron.addEventListener('click', () => {
-      this._expanded = !this._expanded;
-      chevron.classList.toggle('open', this._expanded);
-      drawer.classList.toggle('open', this._expanded);
+    if (chevron && drawer) {
+      chevron.addEventListener('click', () => {
+        this._expanded = !this._expanded;
+        chevron.classList.toggle('open', this._expanded);
+        drawer.classList.toggle('open', this._expanded);
+      });
+    }
+
+    // Segmented Mode Buttons
+    const segButtons = this.shadowRoot.querySelectorAll('.ha-seg-btn');
+    segButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const mode = btn.dataset.mode;
+        if (mode) this._handleModeChange(mode);
+      });
     });
 
-    const modeSelect = this.shadowRoot.getElementById('mode-select');
-    modeSelect.addEventListener('change', (e) => {
-      this._handleModeChange(e.target.value);
-    });
+    const tileHw = this.shadowRoot.getElementById('tile-hw');
+    if (tileHw) {
+      tileHw.addEventListener('click', () => {
+        this._toggleSwitch(this._getEntityMap().hot_water_switch);
+      });
+    }
 
-    const switchHw = this.shadowRoot.getElementById('switch-hw');
-    switchHw.addEventListener('click', () => {
-      this._toggleSwitch(this._getEntityMap().hot_water_switch);
-    });
-
-    const switchBoost = this.shadowRoot.getElementById('switch-boost');
-    switchBoost.addEventListener('click', () => {
-      this._toggleSwitch(this._getEntityMap().hot_water_boost_switch);
-    });
+    const tileBoost = this.shadowRoot.getElementById('tile-boost');
+    if (tileBoost) {
+      tileBoost.addEventListener('click', () => {
+        this._toggleSwitch(this._getEntityMap().hot_water_boost_switch);
+      });
+    }
 
     // Badge click bindings
     const bindClick = (elemId, key) => {
@@ -1130,46 +1323,47 @@ class ThermiaCard extends HTMLElement {
 
     // 4. Water Heater / Mode selector
     const waterHeaterState = this._hass.states[map.water_heater];
-    const modeSelect = this.shadowRoot.getElementById('mode-select');
-    if (waterHeaterState && modeSelect) {
-      const currentOp = waterHeaterState.state;
-      const opList = waterHeaterState.attributes.operation_list || ['Auto', 'Manual', 'Off'];
-      
-      if (modeSelect.options.length !== opList.length) {
-        modeSelect.innerHTML = '';
-        opList.forEach(op => {
-          const opt = document.createElement('option');
-          opt.value = op;
-          opt.textContent = op;
-          modeSelect.appendChild(opt);
-        });
-      }
-      modeSelect.value = currentOp;
-      
+    if (waterHeaterState) {
+      const currentOp = waterHeaterState.state || 'Auto';
       const friendlyName = waterHeaterState.attributes.friendly_name || 'Thermia';
-      setText('mode-heat-pump-name', `${friendlyName} Mode`);
+      setText('mode-heat-pump-name', friendlyName);
       const targetT = waterHeaterState.attributes.temperature;
       const curT = waterHeaterState.attributes.current_temperature;
       if (targetT !== undefined) {
-        setText('mode-subtitle', `${currentOp.toUpperCase()} ${targetT} °C${curT !== undefined ? ` • Current: ${curT} °C` : ''}`);
+        setText('mode-subtitle', `${currentOp} • Target: ${targetT} °C${curT !== undefined ? ` • Current: ${curT} °C` : ''}`);
       } else {
-        setText('mode-subtitle', `Current: ${currentOp}`);
+        setText('mode-subtitle', `Mode: ${currentOp}`);
       }
+
+      // Highlight active segmented button
+      const segButtons = this.shadowRoot.querySelectorAll('.ha-seg-btn');
+      segButtons.forEach(btn => {
+        const isActive = btn.dataset.mode && (btn.dataset.mode.toLowerCase() === currentOp.toLowerCase());
+        btn.classList.toggle('active', isActive);
+      });
     }
 
     // 5. Switches on Main Card
     const hwSwitchOn = this._isEntityOn(map.hot_water_switch);
     const switchHw = this.shadowRoot.getElementById('switch-hw');
+    const hwIconBox = this.shadowRoot.getElementById('hw-icon-box');
     if (switchHw) {
       switchHw.classList.toggle('on', hwSwitchOn);
       setText('status-hw', hwSwitchOn ? 'On' : 'Off');
     }
+    if (hwIconBox) {
+      hwIconBox.className = `ha-icon-box ${hwSwitchOn ? 'hw-active' : 'inactive'}`;
+    }
 
     const boostOn = this._isEntityOn(map.hot_water_boost_switch);
     const switchBoost = this.shadowRoot.getElementById('switch-boost');
+    const boostIconBox = this.shadowRoot.getElementById('boost-icon-box');
     if (switchBoost) {
       switchBoost.classList.toggle('on', boostOn);
-      setText('status-boost', boostOn ? 'Boost Active' : 'Off');
+      setText('status-boost', boostOn ? 'Active' : 'Off');
+    }
+    if (boostIconBox) {
+      boostIconBox.className = `ha-icon-box ${boostOn ? 'boost-active' : 'inactive'}`;
     }
 
     // 6. Drawer Secondary Stats
