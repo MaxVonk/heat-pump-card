@@ -2,7 +2,7 @@
  * Thermia & Multi-Brand Heat Pump Card for Home Assistant
  * Compatible with Ground-Source (Geothermal/Brine) & Air-to-Water heat pumps
  * Author: Antigravity & MaxVonk
- * Version: 1.3.0
+ * Version: 1.3.1
  */
 
 class ThermiaCard extends HTMLElement {
@@ -347,12 +347,19 @@ class ThermiaCard extends HTMLElement {
           }
         }
 
-        svg {
+        .schematic-wrapper svg {
           width: 100%;
           max-width: 380px;
           height: auto;
           display: block;
           user-select: none;
+        }
+
+        .alarm-banner svg {
+          width: 14px;
+          height: 14px;
+          display: inline-block;
+          flex-shrink: 0;
         }
 
         /* Keyframes */
@@ -435,6 +442,12 @@ class ThermiaCard extends HTMLElement {
           justify-content: center;
           flex-shrink: 0;
           transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .ha-icon-box svg {
+          width: 20px;
+          height: 20px;
+          display: block;
+          flex-shrink: 0;
         }
         .ha-icon-box.primary {
           background: rgba(var(--rgb-primary-color, 3, 169, 244), 0.12);
@@ -576,31 +589,50 @@ class ThermiaCard extends HTMLElement {
           background: var(--primary-color, #0284c7);
         }
 
-        /* Expander Bar */
-        .ha-expander {
+        /* Expander Bar with hairline divider */
+        .ha-expander-wrap {
           display: flex;
           align-items: center;
-          justify-content: space-between;
-          padding: 8px 10px;
-          margin-top: 4px;
-          border-radius: 8px;
-          cursor: pointer;
-          transition: background 0.15s ease, color 0.15s ease;
-          user-select: none;
-          color: var(--secondary-text-color, #6b7280);
-          font-size: 0.78rem;
-          font-weight: 500;
+          justify-content: center;
+          margin: 12px 0 6px 0;
+          position: relative;
         }
-        .ha-expander:hover {
-          background: var(--secondary-background-color, rgba(125, 125, 125, 0.08));
-          color: var(--primary-text-color, #111827);
+        .ha-expander-wrap::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          right: 0;
+          height: 1px;
+          background: var(--ha-card-border-color, var(--divider-color, rgba(0, 0, 0, 0.08)));
+          z-index: 0;
         }
-        .ha-expander-label {
-          display: flex;
+        .ha-expander {
+          position: relative;
+          z-index: 1;
+          display: inline-flex;
           align-items: center;
           gap: 6px;
+          padding: 4px 12px;
+          background: var(--ha-card-background, var(--card-background-color, #ffffff));
+          border: 1px solid var(--ha-card-border-color, var(--divider-color, rgba(0, 0, 0, 0.08)));
+          border-radius: 9999px;
+          cursor: pointer;
+          transition: all 0.15s ease;
+          user-select: none;
+          color: var(--secondary-text-color, #6b7280);
+          font-size: 0.74rem;
+          font-weight: 500;
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+        }
+        .ha-expander:hover {
+          color: var(--primary-text-color, #111827);
+          border-color: var(--primary-color, #0284c7);
         }
         .ha-expander-chevron {
+          width: 16px;
+          height: 16px;
+          display: block;
+          flex-shrink: 0;
           transition: transform 0.25s ease;
         }
         .ha-expander.open .ha-expander-chevron {
@@ -709,6 +741,12 @@ class ThermiaCard extends HTMLElement {
           letter-spacing: 0.04em;
           color: var(--secondary-text-color, #6b7280);
           margin-bottom: 8px;
+        }
+        .ha-stats-header svg {
+          width: 14px;
+          height: 14px;
+          display: inline-block;
+          flex-shrink: 0;
         }
         .ha-stats-grid {
           display: grid;
@@ -1059,16 +1097,13 @@ class ThermiaCard extends HTMLElement {
         </div>
 
         <!-- Expander Button Bar -->
-        <div class="ha-expander" id="chevron-btn" title="Toggle detailed metrics">
-          <span class="ha-expander-label">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+        <div class="ha-expander-wrap">
+          <div class="ha-expander" id="chevron-btn" title="Toggle detailed metrics">
+            <span>Detailed Metrics</span>
+            <svg class="ha-expander-chevron" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
             </svg>
-            Detailed Metrics & Runtime
-          </span>
-          <svg class="ha-expander-chevron" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
-          </svg>
+          </div>
         </div>
 
         <!-- Expandable Drawer in Pure HA Style -->
