@@ -1,0 +1,137 @@
+# ##############################################################################
+# Thermia Heat Pump Classic Dashboard Card (Fixed & Adapted)
+# Compatible with klejejs/ha-thermia-heat-pump-integration
+# Requires HACS frontend cards:
+#   1. HTML Jinja2 Template card (custom:html-template-card)
+#   2. fold-entity-row (custom:fold-entity-row)
+#
+# Ensure the PNG image files are placed in Home Assistant at:
+#   /config/www/community/vp_base.png
+#   /config/www/community/vp_base_hw.png
+#   /config/www/community/vp_base_hgwon.png
+# (served at /local/community/vp_base.png, etc.)
+# ##############################################################################
+
+type: entities
+title: Thermia Heat Pump
+show_header_toggle: false
+entities:
+  - type: custom:html-template-card
+    title: null
+    ignore_line_breaks: true
+    content: >
+      <style>
+        .hpwidget-val {
+          width: 38px;
+          height: 18px;
+          background: #9ca3af;
+          text-align: center;
+          color: white;
+          border-radius: 4px;
+          font-size: 11px;
+          font-weight: 600;
+          line-height: 18px;
+          box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        .hpwidget-unit-span {
+          font-size: 80%;
+          margin-left: 1px;
+        }
+        @keyframes rotating {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        @keyframes blink {
+          50% { opacity: 0; }
+        }
+      </style>
+
+      <div style="height:320px; width:100%; position:relative; display:flex; justify-content:center; align-items:center; overflow:hidden;">
+        <div style="position:relative; width:300px; height:300px;">
+          <!-- Heat Pump Cabinet Image -->
+          {% if is_state('binary_sensor.thermia_hot_water_operational_status', 'on') %}
+            <img src="/local/community/vp_base_hw.png" style="position:absolute; top:0; left:80px; height:300px;" alt="Thermia HW" />
+          {% else %}
+            <img src="/local/community/vp_base.png" style="position:absolute; top:0; left:80px; height:300px;" alt="Thermia" />
+          {% endif %}
+
+          <!-- Brine In Temperature (Lower left) -->
+          <div class="hpwidget-val" title="Brine In" style="position:absolute; top:238px; left:18px; z-index:3;">
+            <span>{{ states('sensor.thermia_brine_in_temperature') | round(0) if states('sensor.thermia_brine_in_temperature') not in ['unavailable', 'unknown'] else '--' }}</span><span class="hpwidget-unit-span">&deg;C</span>
+          </div>
+
+          <!-- Brine Out Temperature (Upper left) -->
+          <div class="hpwidget-val" title="Brine Out" style="position:absolute; top:95px; left:18px; z-index:3;">
+            <span>{{ states('sensor.thermia_brine_out_temperature') | round(0) if states('sensor.thermia_brine_out_temperature') not in ['unavailable', 'unknown'] else '--' }}</span><span class="hpwidget-unit-span">&deg;C</span>
+          </div>
+
+          <!-- Brine Pump Status / Rotation -->
+          <ha-icon icon="mdi:fan" style="position:absolute; top:125px; left:22px; z-index:2; color:#1f2937; {% if is_state('binary_sensor.thermia_brine_pump_operational_status', 'on') %}animation: rotating 2s linear infinite;{% endif %}"></ha-icon>
+
+          <!-- Hot Water / Boiler Temperature (Top) -->
+          <div class="hpwidget-val" title="Hot Water" style="position:absolute; top:78px; left:148px; z-index:3;">
+            <span>{{ states('sensor.thermia_hot_water_temperature') | round(0) if states('sensor.thermia_hot_water_temperature') not in ['unavailable', 'unknown'] else '--' }}</span><span class="hpwidget-unit-span">&deg;C</span>
+          </div>
+
+          <!-- Compressor Icon & Animation (Center Gear) -->
+          <ha-icon icon="mdi:cog" style="position:absolute; top:152px; left:146px; --mdc-icon-size:42px; z-index:2; color:#1f2937; {% if is_state('binary_sensor.thermia_compressor_operational_status', 'on') %}animation: rotating 2s linear infinite;{% endif %}"></ha-icon>
+
+          <!-- Supply Line Temperature (Top right with flame) -->
+          <div class="hpwidget-val" title="Supply Line" style="position:absolute; top:90px; left:238px; z-index:3;">
+            <span>{{ states('sensor.thermia_supply_line_temperature') | round(0) if states('sensor.thermia_supply_line_temperature') not in ['unavailable', 'unknown'] else '--' }}</span><span class="hpwidget-unit-span">&deg;C</span>
+          </div>
+          <ha-icon icon="mdi:fire" style="position:absolute; top:88px; left:280px; z-index:3; color:#ef4444; --mdc-icon-size:18px;"></ha-icon>
+
+          <!-- Radiator / Desired Supply Line Temperature -->
+          <div class="hpwidget-val" title="Desired Supply" style="position:absolute; top:134px; left:238px; z-index:3;">
+            <span>{{ states('sensor.thermia_desired_supply_line_temperature') | round(0) if states('sensor.thermia_desired_supply_line_temperature') not in ['unavailable', 'unknown'] else '--' }}</span><span class="hpwidget-unit-span">&deg;C</span>
+          </div>
+          <ha-icon icon="mdi:radiator" style="position:absolute; top:134px; left:280px; z-index:3; color:#6b7280; --mdc-icon-size:18px;"></ha-icon>
+
+          <!-- Return Line Temperature (Bottom right) -->
+          <div class="hpwidget-val" title="Return Line" style="position:absolute; top:215px; left:238px; z-index:3;">
+            <span>{{ states('sensor.thermia_return_line_temperature') | round(0) if states('sensor.thermia_return_line_temperature') not in ['unavailable', 'unknown'] else '--' }}</span><span class="hpwidget-unit-span">&deg;C</span>
+          </div>
+
+          <!-- Circulation Pump Status / Rotation -->
+          <ha-icon icon="mdi:fan" style="position:absolute; top:245px; left:248px; z-index:2; color:#1f2937; {% if is_state('binary_sensor.thermia_circulation_pump_operational_status', 'on') %}animation: rotating 2s linear infinite;{% endif %}"></ha-icon>
+
+          <!-- System Timestamp -->
+          <div class="hpwidget-val" title="Time" style="position:absolute; top:296px; left:85px; width:130px; z-index:3; font-size:10px;">
+            <span>{{ now().strftime('%Y-%m-%d %H:%M') }}</span>
+          </div>
+        </div>
+      </div>
+
+  <!-- Mode Control -->
+  - entity: water_heater.thermia
+    name: Thermia Mode
+
+  <!-- Collapsible Secondary Metrics & Controls -->
+  - type: custom:fold-entity-row
+    head:
+      type: section
+      label: Detailed Temperatures & Statistics
+    open: false
+    entities:
+      - entity: sensor.thermia_outdoor_temperature
+        name: Outdoor Temperature
+      - entity: sensor.thermia_indoor_temperature
+        name: Indoor Temperature
+      - entity: sensor.thermia_heat_target_temperature
+        name: Heat Target Temperature
+      - entity: sensor.thermia_integral
+        name: System Integral
+      - entity: switch.thermia_hot_water
+        name: Hot Water Operation
+      - entity: switch.thermia_hot_water_boost
+        name: Hot Water Boost
+      - entity: sensor.thermia_compressor_operational_time
+        name: Compressor Operating Hours
+      - entity: sensor.thermia_heating_operational_time
+        name: Heating Operating Hours
+      - entity: sensor.thermia_hot_water_operational_time
+        name: Hot Water Operating Hours
+      - entity: sensor.thermia_active_alarms
+        name: Active Alarms
+
