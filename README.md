@@ -1,8 +1,19 @@
-# Thermia Heat Pump Home Assistant Card
+<p align="center">
+  <img src="images/icon.png" alt="Thermia Heat Pump Card Icon" width="128" height="128" style="border-radius: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.3);">
+</p>
 
-A beautiful, interactive Home Assistant dashboard card for monitoring and controlling your **Thermia heat pump**, specifically designed for the [klejejs/ha-thermia-heat-pump-integration](https://github.com/klejejs/ha-thermia-heat-pump-integration) (Thermia Online API) and also backward-compatible with [ThermIQ-MQTT](https://github.com/ThermIQ/thermiq_mqtt-ha).
+<h1 align="center">Thermia Heat Pump Card</h1>
 
-Supports both **Ground-Source (Geothermal)** and **Air-to-Water** heat pumps!
+<p align="center">
+  A beautiful, interactive Home Assistant dashboard card for monitoring and controlling your <b>Thermia heat pump</b>.<br/>
+  Supports both <b>Ground-Source (Geothermal)</b> and <b>Air-to-Water</b> heat pump systems.
+</p>
+
+<p align="center">
+  <a href="https://github.com/MaxVonk/thermia-card/releases"><img src="https://img.shields.io/github/v/release/MaxVonk/thermia-card?style=flat-square&color=blue" alt="Latest Release"></a>
+  <a href="https://github.com/hacs/default"><img src="https://img.shields.io/badge/HACS-Custom-orange.svg?style=flat-square" alt="HACS"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/MaxVonk/thermia-card?style=flat-square&color=green" alt="License"></a>
+</p>
 
 ---
 
