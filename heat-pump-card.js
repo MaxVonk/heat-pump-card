@@ -2,7 +2,7 @@
  * Heat Pump Card for Home Assistant
  * Compatible with Ground-Source (Geothermal/Brine) & Air-to-Water heat pumps across multiple brands
  * Author: Antigravity & MaxVonk
- * Version: 1.4.0
+ * Version: 1.4.1
  */
 
 class HeatPumpCard extends HTMLElement {
@@ -995,8 +995,8 @@ class HeatPumpCard extends HTMLElement {
               <text class="badge-text" id="val-hot-water">--°c</text>
             </g>
 
-            <!-- Row 3: Discharge / Internal Temp Badge (below check valve, above gear) -->
-            <g class="badge-group" id="badge-internal" transform="translate(190, 148)">
+            <!-- Row 3: Discharge / Internal Temp Badge (optional: hidden if sensor not present) -->
+            <g class="badge-group" id="badge-internal" transform="translate(190, 148)" style="display: none;">
               <rect class="badge-rect" x="-25" y="-10" width="50" height="20" filter="url(#badge-shadow)" />
               <text class="badge-text" id="val-internal">--°c</text>
             </g>
@@ -1301,13 +1301,25 @@ class HeatPumpCard extends HTMLElement {
     const desired = this._getState(map.desired_supply_temp);
     const ret = this._getState(map.return_temp);
     const hotWater = this._getState(map.hot_water_temp);
-    const pressurePipe = this._getState(map.pressure_pipe_temp, supply);
 
     setText('val-supply', this._formatBadgeTemp(supply));
     setText('val-desired-supply', this._formatBadgeTemp(desired));
     setText('val-return', this._formatBadgeTemp(ret));
     setText('val-hot-water', this._formatBadgeTemp(hotWater));
-    setText('val-internal', this._formatBadgeTemp(pressurePipe));
+
+    // Pressure Pipe / Discharge Temp (optional: only show if entity exists)
+    const internalBadge = this.shadowRoot.getElementById('badge-internal');
+    const pressurePipeEntity = map.pressure_pipe_temp;
+    const hasPressurePipe = !!(pressurePipeEntity && this._hass && this._hass.states[pressurePipeEntity] && this._hass.states[pressurePipeEntity].state !== 'unavailable' && this._hass.states[pressurePipeEntity].state !== 'unknown');
+    if (internalBadge) {
+      if (hasPressurePipe) {
+        internalBadge.style.display = '';
+        const pressurePipe = this._getState(pressurePipeEntity);
+        setText('val-internal', this._formatBadgeTemp(pressurePipe));
+      } else {
+        internalBadge.style.display = 'none';
+      }
+    }
 
     // 2. Source Loop Temperatures & Status
     const compressorOn = this._isEntityOn(map.compressor);
