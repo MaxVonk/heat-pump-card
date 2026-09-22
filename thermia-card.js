@@ -2,7 +2,7 @@
  * Thermia & Multi-Brand Heat Pump Card for Home Assistant
  * Compatible with Ground-Source (Geothermal/Brine) & Air-to-Water heat pumps
  * Author: Antigravity & MaxVonk
- * Version: 1.3.1
+ * Version: 1.3.2
  */
 
 class ThermiaCard extends HTMLElement {
@@ -349,9 +349,10 @@ class ThermiaCard extends HTMLElement {
 
         .schematic-wrapper svg {
           width: 100%;
-          max-width: 380px;
+          max-width: 400px;
           height: auto;
           display: block;
+          margin: 0 auto;
           user-select: none;
         }
 
@@ -792,31 +793,31 @@ class ThermiaCard extends HTMLElement {
         </div>
 
         <div class="schematic-wrapper">
-          <svg viewBox="0 0 380 340">
+          <svg viewBox="0 0 400 360">
             <defs>
-              <linearGradient id="cab-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <linearGradient id="cab-grad" x1="145" y1="0" x2="255" y2="0" gradientUnits="userSpaceOnUse">
                 <stop offset="0%" stop-color="#d1d5db" />
                 <stop offset="15%" stop-color="#f3f4f6" />
                 <stop offset="85%" stop-color="#f3f4f6" />
                 <stop offset="100%" stop-color="#9ca3af" />
               </linearGradient>
 
-              <linearGradient id="brine-in-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <linearGradient id="brine-in-grad" x1="25" y1="0" x2="165" y2="0" gradientUnits="userSpaceOnUse">
                 <stop offset="0%" stop-color="#0284c7" />
                 <stop offset="100%" stop-color="#38bdf8" />
               </linearGradient>
 
-              <linearGradient id="brine-out-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <linearGradient id="brine-out-grad" x1="165" y1="0" x2="25" y2="0" gradientUnits="userSpaceOnUse">
                 <stop offset="0%" stop-color="#7c3aed" />
-                <stop offset="100%" stop-color="#8b5cf6" />
+                <stop offset="100%" stop-color="#a855f7" />
               </linearGradient>
 
-              <linearGradient id="supply-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#b91c1c" />
+              <linearGradient id="supply-grad" x1="230" y1="0" x2="380" y2="0" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#dc2626" />
                 <stop offset="100%" stop-color="#ef4444" />
               </linearGradient>
 
-              <linearGradient id="return-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <linearGradient id="return-grad" x1="380" y1="0" x2="230" y2="0" gradientUnits="userSpaceOnUse">
                 <stop offset="0%" stop-color="#9333ea" />
                 <stop offset="100%" stop-color="#c026d3" />
               </linearGradient>
@@ -827,24 +828,24 @@ class ThermiaCard extends HTMLElement {
             </defs>
 
             <!-- Feet of indoor unit -->
-            <rect x="156" y="286" width="16" height="5" rx="1.5" fill="#4b5563" />
-            <rect x="208" y="286" width="16" height="5" rx="1.5" fill="#4b5563" />
+            <rect x="162" y="304" width="18" height="6" rx="2" fill="#4b5563" />
+            <rect x="220" y="304" width="18" height="6" rx="2" fill="#4b5563" />
 
             <!-- Main Indoor Cabinet Frame -->
-            <rect x="145" y="16" width="90" height="270" rx="9" fill="url(#cab-grad)" stroke="#9ca3af" stroke-width="1.5" />
-            <line x1="146" y1="32" x2="234" y2="32" stroke="#d1d5db" stroke-width="1" />
-            <rect x="170" y="40" width="40" height="42" rx="3" fill="#374151" stroke="#1f2937" stroke-width="1" />
-            <rect x="174" y="44" width="32" height="34" rx="2" fill="#1e293b" />
+            <rect x="145" y="14" width="110" height="290" rx="10" fill="url(#cab-grad)" stroke="#9ca3af" stroke-width="1.6" />
+            <line x1="146" y1="30" x2="254" y2="30" stroke="#d1d5db" stroke-width="1" />
+            <rect x="178" y="38" width="44" height="42" rx="4" fill="#374151" stroke="#1f2937" stroke-width="1" />
+            <rect x="182" y="42" width="36" height="34" rx="2" fill="#1e293b" />
 
             <!-- ================= LEFT SOURCE CIRCUIT ================= -->
             ${!isAir ? `
               <!-- Ground-Source Brine Circuit -->
-              <path d="M 30 250 L 158 250 L 158 238" fill="none" stroke="url(#brine-in-grad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
-              <rect x="153" y="145" width="10" height="92" rx="2" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.2" />
-              <path d="M 158 145 L 158 132 L 30 132" fill="none" stroke="url(#brine-out-grad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M 25 260 L 161 260 L 161 248" fill="none" stroke="url(#brine-in-grad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+              <rect x="156" y="142" width="10" height="106" rx="2" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.2" />
+              <path d="M 161 142 L 161 132 L 25 132" fill="none" stroke="url(#brine-out-grad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
 
               <!-- Brine Pump Housing -->
-              <g transform="translate(75, 132)">
+              <g transform="translate(85, 132)">
                 <circle cx="0" cy="0" r="17" fill="#ffffff" stroke="#6b7280" stroke-width="2.5" />
                 <g id="brine-pump-spin-group" class="">
                   <path d="M -9 0 A 9 9 0 0 1 7 -5" fill="none" stroke="#1f2937" stroke-width="2" stroke-linecap="round" />
@@ -855,23 +856,23 @@ class ThermiaCard extends HTMLElement {
               </g>
 
               <!-- Brine flow arrows -->
-              <polygon points="85,247 95,250 85,253" fill="#ffffff" opacity="0.9" />
-              <polygon points="120,129 110,132 120,135" fill="#ffffff" opacity="0.9" />
+              <polygon points="90,257 100,260 90,263" fill="#ffffff" opacity="0.9" />
+              <polygon points="128,129 118,132 128,135" fill="#ffffff" opacity="0.9" />
 
               <!-- Brine In Badge -->
-              <g class="badge-group" id="badge-brine-in" transform="translate(68, 238)">
+              <g class="badge-group" id="badge-brine-in" transform="translate(85, 238)">
                 <rect class="badge-rect" x="-26" y="-10" width="52" height="20" filter="url(#badge-shadow)" />
                 <text class="badge-text" id="val-brine-in">--°c</text>
               </g>
 
               <!-- Brine Pump Speed Badge -->
-              <g class="badge-group" id="badge-brine-pump" transform="translate(75, 158)">
+              <g class="badge-group" id="badge-brine-pump" transform="translate(85, 168)">
                 <rect class="badge-rect" x="-24" y="-9" width="48" height="18" filter="url(#badge-shadow)" />
                 <text class="badge-text" id="val-brine-pump">ON</text>
               </g>
 
               <!-- Brine Out Badge -->
-              <g class="badge-group" id="badge-brine-out" transform="translate(68, 102)">
+              <g class="badge-group" id="badge-brine-out" transform="translate(85, 96)">
                 <rect class="badge-rect" x="-26" y="-10" width="52" height="20" filter="url(#badge-shadow)" />
                 <text class="badge-text" id="val-brine-out">--°c</text>
               </g>
@@ -879,23 +880,22 @@ class ThermiaCard extends HTMLElement {
               <!-- Air-to-Water Outdoor Unit -->
               <g id="outdoor-unit-group">
                 <!-- Outdoor unit casing -->
-                <rect x="22" y="90" width="102" height="145" rx="8" fill="url(#cab-grad)" stroke="#9ca3af" stroke-width="1.6" />
+                <rect x="22" y="96" width="104" height="174" rx="8" fill="url(#cab-grad)" stroke="#9ca3af" stroke-width="1.6" />
                 <!-- Outdoor feet -->
-                <rect x="30" y="235" width="14" height="4" rx="1" fill="#4b5563" />
-                <rect x="102" y="235" width="14" height="4" rx="1" fill="#4b5563" />
+                <rect x="30" y="270" width="16" height="5" rx="1" fill="#4b5563" />
+                <rect x="100" y="270" width="16" height="5" rx="1" fill="#4b5563" />
 
                 <!-- Evaporator fins on left side -->
-                <line x1="28" y1="102" x2="28" y2="223" stroke="#94a3b8" stroke-width="2" stroke-dasharray="3,3" />
-                <line x1="33" y1="102" x2="33" y2="223" stroke="#94a3b8" stroke-width="2" stroke-dasharray="3,3" />
+                <line x1="28" y1="110" x2="28" y2="258" stroke="#94a3b8" stroke-width="2" stroke-dasharray="3,3" />
+                <line x1="33" y1="110" x2="33" y2="258" stroke="#94a3b8" stroke-width="2" stroke-dasharray="3,3" />
 
                 <!-- Big Outdoor Axial Fan Shroud -->
-                <circle cx="74" cy="162" r="33" fill="#1e293b" stroke="#64748b" stroke-width="2" />
-                <circle cx="74" cy="162" r="28" fill="none" stroke="#475569" stroke-width="1" stroke-dasharray="4,3" />
+                <circle cx="74" cy="180" r="34" fill="#1e293b" stroke="#64748b" stroke-width="2" />
+                <circle cx="74" cy="180" r="29" fill="none" stroke="#475569" stroke-width="1" stroke-dasharray="4,3" />
 
                 <!-- Rotating Fan Blades -->
-                <g transform="translate(74, 162)">
+                <g transform="translate(74, 180)">
                   <g id="outdoor-fan-spin-group" class="spin-fast">
-                    <!-- 4 Aerodynamic Blades -->
                     <path d="M 0 0 C 4 -12 14 -18 22 -15 C 24 -11 18 -4 0 0 Z" fill="#94a3b8" />
                     <path d="M 0 0 C 12 4 18 14 15 22 C 11 24 4 18 0 0 Z" fill="#94a3b8" />
                     <path d="M 0 0 C -4 12 -14 18 -22 15 C -24 11 -18 4 0 0 Z" fill="#94a3b8" />
@@ -905,26 +905,24 @@ class ThermiaCard extends HTMLElement {
                 </g>
 
                 <!-- Connecting Refrigerant Lines to Indoor Cabinet -->
-                <path d="M 124 132 L 145 132" fill="none" stroke="url(#brine-out-grad)" stroke-width="6" stroke-linecap="round" />
-                <path d="M 124 215 L 145 215" fill="none" stroke="url(#brine-in-grad)" stroke-width="6" stroke-linecap="round" />
+                <path d="M 126 132 L 145 132" fill="none" stroke="url(#brine-out-grad)" stroke-width="7" stroke-linecap="round" />
+                <path d="M 126 260 L 145 260" fill="none" stroke="url(#brine-in-grad)" stroke-width="7" stroke-linecap="round" />
 
                 <!-- Air flow arrows -->
-                <polygon points="12,159 18,162 12,165" fill="#38bdf8" opacity="0.9" />
+                <polygon points="12,177 18,180 12,183" fill="#38bdf8" opacity="0.9" />
                 <polygon points="132,129 138,132 132,135" fill="#ffffff" opacity="0.9" />
 
                 <!-- Outdoor Air Temp Badge (Top of outdoor unit) -->
                 <g class="badge-group" id="badge-outdoor-air" transform="translate(74, 68)">
                   <rect class="badge-rect" x="-26" y="-10" width="52" height="20" filter="url(#badge-shadow)" />
                   <text class="badge-text" id="val-outdoor-air">--°c</text>
-                  <!-- Thermometer / sun mini icon -->
                   <circle cx="32" cy="0" r="3" fill="#f59e0b" />
                 </g>
 
                 <!-- Evaporator / Defrost Temp Badge (Bottom of outdoor unit) -->
-                <g class="badge-group" id="badge-evaporator" transform="translate(74, 258)">
+                <g class="badge-group" id="badge-evaporator" transform="translate(74, 292)">
                   <rect class="badge-rect" x="-26" y="-10" width="52" height="20" filter="url(#badge-shadow)" />
                   <text class="badge-text" id="val-evaporator">--°c</text>
-                  <!-- Defrost active snowflake icon -->
                   <g id="defrost-icon" transform="translate(30, -5)" style="display:none;">
                     <path d="M 5 0 L 5 10 M 0 5 L 10 5 M 1 1 L 9 9 M 9 1 L 1 9" stroke="#38bdf8" stroke-width="1.2" />
                   </g>
@@ -933,20 +931,28 @@ class ThermiaCard extends HTMLElement {
             `}
 
             <!-- ================= REFRIGERANT CIRCUIT (Center) ================= -->
-            <path d="M 168 120 L 168 98 L 212 98 L 212 120" fill="none" stroke="url(#brine-out-grad)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
-            <circle cx="190" cy="98" r="14" fill="#ffffff" stroke="#1f2937" stroke-width="2" />
-            <path d="M 183 93 L 197 98 L 183 103 Z" fill="#1f2937" />
+            <!-- Condenser Column on right side inside cabinet -->
+            <rect x="234" y="126" width="10" height="122" rx="2" fill="#fce7f3" stroke="#db2777" stroke-width="1.2" />
 
-            <line x1="168" y1="120" x2="168" y2="242" stroke="#3b82f6" stroke-width="7" stroke-linecap="round" />
-            <line x1="212" y1="120" x2="212" y2="242" stroke="url(#return-grad)" stroke-width="7" stroke-linecap="round" />
+            <!-- Upper Loop from Check Valve -->
+            <path d="M 174 126 L 174 110 L 226 110 L 226 126" fill="none" stroke="url(#brine-out-grad)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+            
+            <!-- Check / 3-Way Valve Circle (Center top) -->
+            <circle cx="200" cy="126" r="14" fill="#ffffff" stroke="#1f2937" stroke-width="2" />
+            <path d="M 194 122 L 206 122 L 200 131 Z" fill="#1f2937" />
 
-            <path d="M 168 242 L 168 266 L 212 266 L 212 242" fill="none" stroke="#3b82f6" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
-            <g transform="translate(190, 266)">
+            <!-- Vertical lines connecting valve down to compressor & condenser -->
+            <line x1="174" y1="126" x2="174" y2="248" stroke="#3b82f6" stroke-width="7" stroke-linecap="round" />
+            <line x1="226" y1="126" x2="226" y2="248" stroke="#9333ea" stroke-width="7" stroke-linecap="round" />
+
+            <!-- Bottom expansion valve loop -->
+            <path d="M 174 248 L 174 274 L 226 274 L 226 248" fill="none" stroke="#3b82f6" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+            <g transform="translate(200, 274)">
               <polygon points="-8,-6 8,6 8,-6 -8,6" fill="#ffffff" stroke="#1f2937" stroke-width="1.8" stroke-linejoin="round" />
             </g>
 
             <!-- Rotating Central Compressor Gear -->
-            <g id="compressor-gear" transform="translate(190, 185)">
+            <g id="compressor-gear" transform="translate(200, 206)">
               <g id="gear-spin-group" class="">
                 <circle cx="0" cy="0" r="16" fill="#1f2937" />
                 <rect x="-3" y="-22" width="6" height="44" rx="2" fill="#1f2937" />
@@ -958,13 +964,16 @@ class ThermiaCard extends HTMLElement {
             </g>
 
             <!-- ================= HEATING CIRCUIT (Right) ================= -->
-            <path d="M 216 112 L 340 112" fill="none" stroke="url(#supply-grad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
-            <path d="M 235 112 L 235 152 L 340 152" fill="none" stroke="url(#supply-grad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
-            <path d="M 340 250 L 222 250" fill="none" stroke="url(#return-grad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
-            <path d="M 222 250 L 222 152" fill="none" stroke="url(#return-grad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+            <!-- Top main supply pipe -->
+            <path d="M 239 114 L 375 114" fill="none" stroke="url(#supply-grad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+            <!-- Radiator branch sub-pipe -->
+            <path d="M 258 114 L 258 162 L 375 162" fill="none" stroke="url(#supply-grad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+            
+            <!-- Continuous Return pipe from radiators into cabinet condenser -->
+            <path d="M 375 260 L 239 260 L 239 248" fill="none" stroke="url(#return-grad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
 
             <!-- Circulation Pump Housing (Right) -->
-            <g transform="translate(295, 250)">
+            <g transform="translate(315, 260)">
               <circle cx="0" cy="0" r="17" fill="#ffffff" stroke="#6b7280" stroke-width="2.5" />
               <g id="circ-pump-spin-group" class="">
                 <path d="M -9 0 A 9 9 0 0 1 7 -5" fill="none" stroke="#1f2937" stroke-width="2" stroke-linecap="round" />
@@ -975,32 +984,32 @@ class ThermiaCard extends HTMLElement {
             </g>
 
             <!-- Heating Flow Arrows -->
-            <polygon points="265,109 275,112 265,115" fill="#ffffff" opacity="0.9" />
-            <polygon points="265,149 275,152 265,155" fill="#ffffff" opacity="0.9" />
-            <polygon points="255,247 245,250 255,253" fill="#ffffff" opacity="0.9" />
+            <polygon points="280,111 290,114 280,117" fill="#ffffff" opacity="0.9" />
+            <polygon points="280,159 290,162 280,165" fill="#ffffff" opacity="0.9" />
+            <polygon points="275,257 265,260 275,263" fill="#ffffff" opacity="0.9" />
 
-            <!-- Badges (Center & Right) -->
-            <!-- Hot Water / Boiler Temp -->
-            <g class="badge-group" id="badge-hot-water" transform="translate(190, 80)">
+            <!-- ================= BADGES (Center & Right) ================= -->
+            <!-- Hot Water / Boiler Temp (Center, above check valve) -->
+            <g class="badge-group" id="badge-hot-water" transform="translate(200, 96)">
               <rect class="badge-rect" x="-25" y="-10" width="50" height="20" filter="url(#badge-shadow)" />
               <text class="badge-text" id="val-hot-water">--°c</text>
             </g>
 
-            <!-- Discharge / Internal Temp -->
-            <g class="badge-group" id="badge-internal" transform="translate(190, 138)">
+            <!-- Discharge / Internal Temp (Center, below check valve, above gear) -->
+            <g class="badge-group" id="badge-internal" transform="translate(200, 158)">
               <rect class="badge-rect" x="-25" y="-10" width="50" height="20" filter="url(#badge-shadow)" />
               <text class="badge-text" id="val-internal">--°c</text>
             </g>
 
-            <!-- Supply Line Temp -->
-            <g class="badge-group" id="badge-supply" transform="translate(295, 96)">
+            <!-- Supply Line Temp (Top Right) -->
+            <g class="badge-group" id="badge-supply" transform="translate(325, 92)">
               <rect class="badge-rect" x="-25" y="-10" width="50" height="20" filter="url(#badge-shadow)" />
               <text class="badge-text" id="val-supply">--°c</text>
               <path d="M 28 3 C 27 -2 30 -7 33 -10 C 34 -8 34 -6 35 -4 C 37 -6 37 -9 37 -10 C 42 -5 44 2 40 7 C 38 9 34 10 32 10 C 29 10 27 7 28 3 Z" fill="#ef4444" />
             </g>
 
-            <!-- Radiator Circuit Temp -->
-            <g class="badge-group" id="badge-desired-supply" transform="translate(295, 138)">
+            <!-- Radiator Circuit Temp (Middle Right) -->
+            <g class="badge-group" id="badge-desired-supply" transform="translate(325, 140)">
               <rect class="badge-rect" x="-25" y="-10" width="50" height="20" filter="url(#badge-shadow)" />
               <text class="badge-text" id="val-desired-supply">--°c</text>
               <g transform="translate(30, -8)">
@@ -1011,20 +1020,20 @@ class ThermiaCard extends HTMLElement {
               </g>
             </g>
 
-            <!-- Return Line Temp -->
-            <g class="badge-group" id="badge-return" transform="translate(295, 218)">
+            <!-- Return Line Temp (Bottom Right, above pump) -->
+            <g class="badge-group" id="badge-return" transform="translate(315, 224)">
               <rect class="badge-rect" x="-25" y="-10" width="50" height="20" filter="url(#badge-shadow)" />
               <text class="badge-text" id="val-return">--°c</text>
             </g>
 
-            <!-- Heating Circulation Pump Speed -->
-            <g class="badge-group" id="badge-circ-pump" transform="translate(295, 276)">
+            <!-- Heating Circulation Pump Speed (Bottom Right, below pump) -->
+            <g class="badge-group" id="badge-circ-pump" transform="translate(315, 296)">
               <rect class="badge-rect" x="-24" y="-9" width="48" height="18" filter="url(#badge-shadow)" />
               <text class="badge-text" id="val-circ-pump">ON</text>
             </g>
 
-            <!-- Timestamp Status Bar -->
-            <g transform="translate(190, 310)">
+            <!-- Timestamp Status Bar (Bottom Center) -->
+            <g transform="translate(200, 334)">
               <rect x="-85" y="-10" width="170" height="20" rx="5" fill="#9ca3af" opacity="0.9" />
               <text id="val-timestamp" x="0" y="1" font-family="inherit" font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle" dominant-baseline="central">--</text>
             </g>
