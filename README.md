@@ -62,7 +62,7 @@ Download `thermia-card.js` from the [Latest Release](https://github.com/MaxVonk/
 2. Click the three dots (top right corner) and select **Resources**.
 3. Click **Add Resource** (+ button at bottom right).
 4. Enter:
-   - **URL**: `/local/thermia-card.js?v=1.3.2`
+   - **URL**: `/local/thermia-card.js?v=1.3.3`
    - **Resource type**: `JavaScript Module`
 5. Click **Create** and hard-refresh your browser (`Ctrl+Shift+R` or `Cmd+Shift+R`).
 
