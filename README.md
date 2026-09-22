@@ -1,18 +1,18 @@
 <p align="center">
-  <img src="images/icon.png" alt="Thermia Heat Pump Card Icon" width="128" height="128" style="border-radius: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.3);">
+  <img src="images/icon.png" alt="Heat Pump Card Icon" width="128" height="128" style="border-radius: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.3);">
 </p>
 
-<h1 align="center">Thermia Heat Pump Card</h1>
+<h1 align="center">Heat Pump Card</h1>
 
 <p align="center">
-  A beautiful, interactive Home Assistant dashboard card for monitoring and controlling your <b>Thermia heat pump</b>.<br/>
-  Supports both <b>Ground-Source (Geothermal)</b> and <b>Air-to-Water</b> heat pump systems.
+  A beautiful, modern, interactive Home Assistant dashboard card for monitoring and controlling heat pumps.<br/>
+  Compatible with <b>multiple brands</b> (Thermia, NIBE, CTC, IVT, Bosch, Viessmann, Mitsubishi, Daikin, etc.) and supports both <b>Ground-Source (Geothermal/Brine)</b> and <b>Air-to-Water</b> systems.
 </p>
 
 <p align="center">
-  <a href="https://github.com/MaxVonk/thermia-card/releases"><img src="https://img.shields.io/github/v/release/MaxVonk/thermia-card?style=flat-square&color=blue" alt="Latest Release"></a>
+  <a href="https://github.com/MaxVonk/heat-pump-card/releases"><img src="https://img.shields.io/github/v/release/MaxVonk/heat-pump-card?style=flat-square&color=blue" alt="Latest Release"></a>
   <a href="https://github.com/hacs/default"><img src="https://img.shields.io/badge/HACS-Custom-orange.svg?style=flat-square" alt="HACS"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/MaxVonk/thermia-card?style=flat-square&color=green" alt="License"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/MaxVonk/heat-pump-card?style=flat-square&color=green" alt="License"></a>
 </p>
 
 ---
@@ -46,14 +46,14 @@ The card faithfully matches the dedicated heat pump schematic view:
 
 ---
 
-## Method 1: Modern Custom Card (`thermia-card.js`) — Recommended
+## Method 1: Modern Custom Card (`heat-pump-card.js`) — Recommended
 
 This method is self-contained: **no external HACS frontend cards or image uploads are required**.
 
-### Step 1: Copy `thermia-card.js` to Home Assistant
-Download `thermia-card.js` from the [Latest Release](https://github.com/MaxVonk/thermia-card/releases) and copy it to your Home Assistant configuration directory under:
+### Step 1: Copy `heat-pump-card.js` to Home Assistant
+Download `heat-pump-card.js` from the [Latest Release](https://github.com/MaxVonk/heat-pump-card/releases) and copy it to your Home Assistant configuration directory under:
 ```text
-/config/www/thermia-card.js
+/config/www/heat-pump-card.js
 ```
 *(Note: Files in `/config/www/` are served by Home Assistant at `/local/`).*
 
@@ -62,9 +62,12 @@ Download `thermia-card.js` from the [Latest Release](https://github.com/MaxVonk/
 2. Click the three dots (top right corner) and select **Resources**.
 3. Click **Add Resource** (+ button at bottom right).
 4. Enter:
-   - **URL**: `/local/thermia-card.js?v=1.3.4`
+   - **URL**: `/local/heat-pump-card.js?v=1.4.0`
    - **Resource type**: `JavaScript Module`
 5. Click **Create** and hard-refresh your browser (`Ctrl+Shift+R` or `Cmd+Shift+R`).
+
+> [!NOTE]
+> **Backward Compatibility**: If you previously used `thermia-card`, existing configurations using `type: custom:thermia-card` continue to work without any changes.
 
 ### Step 3: Add the Card to Your Dashboard
 
@@ -72,8 +75,8 @@ Download `thermia-card.js` from the [Latest Release](https://github.com/MaxVonk/
 In any dashboard, click **Edit Dashboard** → **Add Card** → **Manual**, and paste:
 
 ```yaml
-type: custom:thermia-card
-title: Thermia Ground Source
+type: custom:heat-pump-card
+title: Ground Source Heat Pump
 system_type: ground_source
 ```
 
@@ -81,8 +84,8 @@ system_type: ground_source
 For outdoor fan unit and evaporator schematic:
 
 ```yaml
-type: custom:thermia-card
-title: Thermia Air-to-Water
+type: custom:heat-pump-card
+title: Air-to-Water Heat Pump
 system_type: air_to_water
 ```
 
@@ -90,7 +93,7 @@ system_type: air_to_water
 > The card includes **automatic entity discovery**. If your heat pump is named `Thermia Diplomat`, it will automatically detect entities like `water_heater.thermia_diplomat` and `sensor.thermia_diplomat_*`.
 > If you have multiple heat pumps or use a specific prefix, simply specify `prefix`:
 > ```yaml
-> type: custom:thermia-card
+> type: custom:heat-pump-card
 > prefix: heat_pump
 > ```
 
@@ -98,30 +101,30 @@ system_type: air_to_water
 If you have custom or renamed entity IDs, you can override any individual entity:
 
 ```yaml
-type: custom:thermia-card
+type: custom:heat-pump-card
 title: My Heat Pump
 system_type: ground_source  # Or air_to_water
-prefix: thermia
+prefix: heat_pump
 entities:
-  supply_temp: sensor.thermia_supply_line_temperature
-  desired_supply_temp: sensor.thermia_desired_supply_line_temperature
-  return_temp: sensor.thermia_return_line_temperature
-  brine_in_temp: sensor.thermia_brine_in_temperature       # ground_source only
-  brine_out_temp: sensor.thermia_brine_out_temperature     # ground_source only
-  outdoor_temp: sensor.thermia_outdoor_temperature         # air_to_water / drawer
-  defrost: binary_sensor.thermia_defrost                   # air_to_water only
-  hot_water_temp: sensor.thermia_hot_water_temperature
-  pressure_pipe_temp: sensor.thermia_supply_line_temperature
-  indoor_temp: sensor.thermia_indoor_temperature
-  heat_target_temp: sensor.thermia_heat_target_temperature
-  integral: sensor.thermia_integral
-  compressor: binary_sensor.thermia_compressor_operational_status
-  brine_pump: binary_sensor.thermia_brine_pump_operational_status
-  circulation_pump: binary_sensor.thermia_circulation_pump_operational_status
-  water_heater: water_heater.thermia
-  hot_water_switch: switch.thermia_hot_water
-  hot_water_boost_switch: switch.thermia_hot_water_boost
-  active_alarms: sensor.thermia_active_alarms
+  supply_temp: sensor.heat_pump_supply_line_temperature
+  desired_supply_temp: sensor.heat_pump_desired_supply_line_temperature
+  return_temp: sensor.heat_pump_return_line_temperature
+  brine_in_temp: sensor.heat_pump_brine_in_temperature       # ground_source only
+  brine_out_temp: sensor.heat_pump_brine_out_temperature     # ground_source only
+  outdoor_temp: sensor.heat_pump_outdoor_temperature         # air_to_water / drawer
+  defrost: binary_sensor.heat_pump_defrost                   # air_to_water only
+  hot_water_temp: sensor.heat_pump_hot_water_temperature
+  pressure_pipe_temp: sensor.heat_pump_supply_line_temperature
+  indoor_temp: sensor.heat_pump_indoor_temperature
+  heat_target_temp: sensor.heat_pump_heat_target_temperature
+  integral: sensor.heat_pump_integral
+  compressor: binary_sensor.heat_pump_compressor_operational_status
+  brine_pump: binary_sensor.heat_pump_brine_pump_operational_status
+  circulation_pump: binary_sensor.heat_pump_circulation_pump_operational_status
+  water_heater: water_heater.heat_pump
+  hot_water_switch: switch.heat_pump_hot_water
+  hot_water_boost_switch: switch.heat_pump_hot_water_boost
+  active_alarms: sensor.heat_pump_active_alarms
 ```
 
 ---
@@ -144,5 +147,5 @@ If you prefer using the exact community PNG graphics (`vp_base.png`, `vp_base_hw
 
 If any sensor displays `--°c`:
 1. In Home Assistant, open **Developer Tools** → **States**.
-2. Filter the entity search by `thermia` or `water_heater`.
-3. Verify your exact sensor names and ensure your Thermia Online credentials and integration status are active in **Settings** → **Devices & Services**.
+2. Filter the entity search by your heat pump name or `water_heater`.
+3. Verify your exact sensor names and ensure your heat pump integration status is active in **Settings** → **Devices & Services**.

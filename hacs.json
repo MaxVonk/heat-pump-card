@@ -1,6 +1,5 @@
 {
-  "name": "Thermia Heat Pump Card",
+  "name": "Heat Pump Card",
   "render_readme": true,
-  "filename": "thermia-card.js"
+  "filename": "heat-pump-card.js"
 }
-
