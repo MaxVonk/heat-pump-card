@@ -2,7 +2,7 @@
  * Thermia & Multi-Brand Heat Pump Card for Home Assistant
  * Compatible with Ground-Source (Geothermal/Brine) & Air-to-Water heat pumps
  * Author: Antigravity & MaxVonk
- * Version: 1.3.3
+ * Version: 1.3.4
  */
 
 class ThermiaCard extends HTMLElement {
@@ -833,9 +833,9 @@ class ThermiaCard extends HTMLElement {
 
             <!-- Main Indoor Cabinet Frame -->
             <rect x="142" y="14" width="96" height="310" rx="10" fill="url(#cab-grad)" stroke="#9ca3af" stroke-width="1.6" />
-            <line x1="143" y1="28" x2="237" y2="28" stroke="#d1d5db" stroke-width="1" />
-            <rect x="172" y="34" width="36" height="42" rx="3" fill="#374151" stroke="#1f2937" stroke-width="1" />
-            <rect x="176" y="38" width="28" height="34" rx="2" fill="#1e293b" />
+            <line x1="143" y1="26" x2="237" y2="26" stroke="#d1d5db" stroke-width="1" />
+            <rect x="174" y="30" width="32" height="38" rx="3" fill="#374151" stroke="#1f2937" stroke-width="1" />
+            <rect x="178" y="34" width="24" height="30" rx="2" fill="#1e293b" />
 
             <!-- ================= LEFT SOURCE CIRCUIT ================= -->
             ${!isAir ? `
@@ -861,20 +861,20 @@ class ThermiaCard extends HTMLElement {
               <polygon points="150,225 156,225 153,217" fill="#ffffff" opacity="0.9" />
               <polygon points="110,113 100,116 110,119" fill="#ffffff" opacity="0.9" />
 
-              <!-- Row 1: Brine Out Badge (aligned with Hot Water & Supply at y=96) -->
-              <g class="badge-group" id="badge-brine-out" transform="translate(68, 96)">
+              <!-- Row 1: Brine Out Badge (aligned with Hot Water & Supply at y=86, 4px above pump) -->
+              <g class="badge-group" id="badge-brine-out" transform="translate(68, 86)">
                 <rect class="badge-rect" x="-26" y="-10" width="52" height="20" filter="url(#badge-shadow)" />
                 <text class="badge-text" id="val-brine-out">--°c</text>
               </g>
 
-              <!-- Brine Pump Speed Badge (under brine pump) -->
-              <g class="badge-group" id="badge-brine-pump" transform="translate(68, 142)">
+              <!-- Brine Pump Speed Badge (5px under brine pump at y=146) -->
+              <g class="badge-group" id="badge-brine-pump" transform="translate(68, 146)">
                 <rect class="badge-rect" x="-24" y="-9" width="48" height="18" filter="url(#badge-shadow)" />
                 <text class="badge-text" id="val-brine-pump">ON</text>
               </g>
 
-              <!-- Row 5: Brine In Badge (aligned with Return at y=252) -->
-              <g class="badge-group" id="badge-brine-in" transform="translate(68, 252)">
+              <!-- Row 5: Brine In Badge (aligned with Return at y=246) -->
+              <g class="badge-group" id="badge-brine-in" transform="translate(68, 246)">
                 <rect class="badge-rect" x="-26" y="-10" width="52" height="20" filter="url(#badge-shadow)" />
                 <text class="badge-text" id="val-brine-in">--°c</text>
               </g>
@@ -986,8 +986,8 @@ class ThermiaCard extends HTMLElement {
             <polygon points="265,159 275,162 265,165" fill="#ffffff" opacity="0.9" />
 
             <!-- ================= BADGES (Center & Right) ================= -->
-            <!-- Row 1: Hot Water Badge (aligned with Brine Out & Supply at y=96) -->
-            <g class="badge-group" id="badge-hot-water" transform="translate(190, 96)">
+            <!-- Row 1: Hot Water Badge (aligned with Brine Out & Supply at y=86) -->
+            <g class="badge-group" id="badge-hot-water" transform="translate(190, 86)">
               <rect class="badge-rect" x="-25" y="-10" width="50" height="20" filter="url(#badge-shadow)" />
               <text class="badge-text" id="val-hot-water">--°c</text>
             </g>
@@ -998,15 +998,15 @@ class ThermiaCard extends HTMLElement {
               <text class="badge-text" id="val-internal">--°c</text>
             </g>
 
-            <!-- Row 1: Supply Line Temp (aligned with Brine Out & Hot Water at y=96) -->
-            <g class="badge-group" id="badge-supply" transform="translate(312, 96)">
+            <!-- Row 1: Supply Line Temp (aligned with Brine Out & Hot Water at y=86) -->
+            <g class="badge-group" id="badge-supply" transform="translate(312, 86)">
               <rect class="badge-rect" x="-25" y="-10" width="50" height="20" filter="url(#badge-shadow)" />
               <text class="badge-text" id="val-supply">--°c</text>
               <path d="M 28 3 C 27 -2 30 -7 33 -10 C 34 -8 34 -6 35 -4 C 37 -6 37 -9 37 -10 C 42 -5 44 2 40 7 C 38 9 34 10 32 10 C 29 10 27 7 28 3 Z" fill="#ef4444" />
             </g>
 
-            <!-- Radiator Circuit Temp (sitting above radiator branch pipe at y=142) -->
-            <g class="badge-group" id="badge-desired-supply" transform="translate(312, 142)">
+            <!-- Radiator Circuit Temp (sitting between supply and radiator pipes at y=138) -->
+            <g class="badge-group" id="badge-desired-supply" transform="translate(312, 138)">
               <rect class="badge-rect" x="-25" y="-10" width="50" height="20" filter="url(#badge-shadow)" />
               <text class="badge-text" id="val-desired-supply">--°c</text>
               <g transform="translate(30, -8)">
@@ -1017,14 +1017,14 @@ class ThermiaCard extends HTMLElement {
               </g>
             </g>
 
-            <!-- Row 5: Return Line Temp (aligned with Brine In at y=252) -->
-            <g class="badge-group" id="badge-return" transform="translate(312, 252)">
+            <!-- Row 5: Return Line Temp (aligned with Brine In at y=246, 4px above circ pump) -->
+            <g class="badge-group" id="badge-return" transform="translate(312, 246)">
               <rect class="badge-rect" x="-25" y="-10" width="50" height="20" filter="url(#badge-shadow)" />
               <text class="badge-text" id="val-return">--°c</text>
             </g>
 
-            <!-- Heating Circulation Pump Speed (under circulation pump at y=312) -->
-            <g class="badge-group" id="badge-circ-pump" transform="translate(312, 312)">
+            <!-- Heating Circulation Pump Speed (5px under circulation pump at y=306) -->
+            <g class="badge-group" id="badge-circ-pump" transform="translate(312, 306)">
               <rect class="badge-rect" x="-24" y="-9" width="48" height="18" filter="url(#badge-shadow)" />
               <text class="badge-text" id="val-circ-pump">ON</text>
             </g>
